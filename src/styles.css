@@ -69,7 +69,9 @@
   --color-navy: var(--navy);
   --color-gold: var(--gold);
   --color-cream: var(--cream);
+  --color-surface: var(--surface);
 }
+
 
 :root {
   --radius: 0.625rem;
