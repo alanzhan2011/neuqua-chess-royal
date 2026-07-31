@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users, Trophy, Target, Calendar, Clock, MapPin } from "lucide-react";
+import { Users, Trophy, Target, Calendar, Clock, MapPin, ExternalLink } from "lucide-react";
 import heroImage from "../assets/hero-chess.jpg";
 import championsAsset from "../assets/sectional-champions.jpg.asset.json";
+import nctvAsset from "../assets/nctv17-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
