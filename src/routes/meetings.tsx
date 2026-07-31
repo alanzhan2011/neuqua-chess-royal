@@ -1,5 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clock, MapPin, Calendar, Info } from "lucide-react";
+import photoLesson from "../assets/Copy_of_20260127_151044.jpg.asset.json";
+import photoGames from "../assets/Copy_of_20260127_160101.jpg.asset.json";
+import photoRoom from "../assets/Copy_of_20250909_151522.jpg.asset.json";
+
+const photos = [
+  { src: photoLesson.url, alt: "Club members analyzing an endgame study on the classroom smartboard" },
+  { src: photoGames.url, alt: "Two members playing a rated game while others compete in the background" },
+  { src: photoRoom.url, alt: "A full room of Neuqua Valley Chess members playing at a weekly meeting" },
+];
+
 
 export const Route = createFileRoute("/meetings")({
   head: () => ({
