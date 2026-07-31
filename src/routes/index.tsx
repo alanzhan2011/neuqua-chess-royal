@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users, Trophy, Target, Calendar, Clock, MapPin, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import heroImage from "../assets/hero-chess.jpg";
 import championsAsset from "../assets/sectional-champions.jpg.asset.json";
 import nctvAsset from "../assets/nctv17-logo.png.asset.json";
@@ -11,13 +11,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Neuqua Valley Chess Club celebrates 30 years of strategy, competition, and community — including our 1st place finish at IHSA Sectionals.",
+          "Neuqua Valley Chess Club celebrates 30 years of strategy, competition, and community — 1st place at IHSA Sectionals and 5th at state.",
       },
       { property: "og:title", content: "Neuqua Valley Chess | Celebrating 30 Years" },
       {
         property: "og:description",
         content:
-          "Thirty years of Neuqua Valley Chess — weekly meetings, lessons, and a 1st place IHSA Sectional championship.",
+          "Thirty years of Neuqua Valley Chess — a 1st place IHSA Sectional championship, 5th at state, and chess outreach at the YMCA.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
@@ -27,29 +27,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
-
-const features = [
-  {
-    icon: Users,
-    title: "All Skill Levels",
-    description: "From first-time players to seasoned competitors, everyone has a seat at the board.",
-  },
-  {
-    icon: Trophy,
-    title: "Compete",
-    description: "Represent Neuqua in local tournaments, ladder matches, and club championships.",
-  },
-  {
-    icon: Target,
-    title: "Improve",
-    description: "Learn openings, tactics, and endgames through guided lessons and peer analysis.",
-  },
-  {
-    icon: Calendar,
-    title: "Weekly Events",
-    description: "Regular meetings, casual play nights, and special themed events all year long.",
-  },
-];
 
 function Index() {
   return (
@@ -142,98 +119,88 @@ function Index() {
         </div>
       </section>
 
-      {/* 5th at state */}
+      {/* 5th at state — text left, NCTV17 logo right */}
       <section className="w-full border-b border-border bg-muted/40 py-24 md:py-32">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <p className="mb-3 text-sm font-semibold tracking-wide text-accent uppercase">State Finals</p>
-          <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-            5th Place at the IHSA State Tournament
-          </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            After winning the Glenbard West sectional, Neuqua Valley finished fifth at the two-day IHSA state chess
-            tournament — the best finish in program history. Freshman Alan Zhan went 6–1, while Steven Bozue and Carter
-            Hanninen each added five wins and a draw for the Wildcats.
-          </p>
-          <div className="mx-auto mt-10 flex max-w-xl flex-col items-center gap-5 rounded-2xl border border-border bg-card p-8 shadow-sm">
-            <img
-              src={nctvAsset.url}
-              alt="NCTV17 logo"
-              width={62}
-              height={65}
-              loading="lazy"
-              className="h-14 w-auto"
-            />
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              As covered by NCTV17: “Waubonsie Valley finishes as team chess state runner up, Neuqua takes fifth.”
-            </p>
-            <a
-              href="https://www.nctv17.org/sports/waubonsie-valley-finishes-as-team-chess-state-runner-up-neuqua-takes-fifth/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Read the article
-              <ExternalLink className="h-4 w-4" />
-            </a>
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+            <div>
+              <p className="mb-3 text-sm font-semibold tracking-wide text-accent uppercase">State Finals</p>
+              <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+                5th Place at the IHSA State Tournament
+              </h2>
+              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+                After winning the Glenbard West sectional, Neuqua Valley finished fifth at the two-day IHSA state chess
+                tournament — the best finish in program history.
+              </p>
+              <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+                Freshman Alan Zhan went 6–1, while Steven Bozue and Carter Hanninen each added five wins and a draw for
+                the Wildcats.
+              </p>
+              <div className="mt-8">
+                <a
+                  href="https://www.nctv17.org/sports/waubonsie-valley-finishes-as-team-chess-state-runner-up-neuqua-takes-fifth/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Read the article
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-5 rounded-2xl border border-border bg-card p-10 shadow-sm">
+              <img
+                src={nctvAsset.url}
+                alt="NCTV17 logo"
+                width={62}
+                height={65}
+                loading="lazy"
+                className="h-20 w-auto"
+              />
+              <p className="text-center text-sm leading-relaxed text-muted-foreground">
+                As covered by NCTV17: “Waubonsie Valley finishes as team chess state runner up, Neuqua takes fifth.”
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-
-      {/* What we do */}
+      {/* YMCA outreach video */}
       <section className="w-full bg-navy-deep py-24 text-cream md:py-32">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="mb-3 text-sm font-semibold tracking-wide text-gold uppercase">What We Do</p>
-            <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">More Than Just Games</h2>
-            <p className="mt-6 text-lg leading-relaxed text-cream/70">
-              We build skills, friendships, and school pride through every event we host.
-            </p>
-          </div>
-          <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="group rounded-xl border border-cream/10 bg-cream/5 p-6 transition-colors hover:border-gold/30 hover:bg-cream/[0.07]"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gold/10 text-gold transition-colors group-hover:bg-gold group-hover:text-navy-deep">
-                  <feature.icon className="h-6 w-6" />
-                </div>
-                <h3 className="font-display text-xl font-semibold">{feature.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-cream/70">{feature.description}</p>
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+            <div>
+              <p className="mb-3 text-sm font-semibold tracking-wide text-gold uppercase">Community</p>
+              <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">Teaching Chess at the YMCA</h2>
+              <p className="mt-6 text-lg leading-relaxed text-cream/70">
+                Our members volunteer at the local YMCA, teaching kids the rules, tactics, and joy of chess — passing the
+                game on to the next generation of players.
+              </p>
+              <div className="mt-8">
+                <a
+                  href="https://www.youtube.com/watch?v=0V7UpuerAQw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-navy-deep transition-colors hover:bg-gold/90"
+                >
+                  Watch on YouTube
+                  <ExternalLink className="h-4 w-4" />
+                </a>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Meeting teaser */}
-      <section className="w-full bg-background py-20 md:py-24">
-        <div className="mx-auto grid max-w-5xl gap-6 px-6 sm:grid-cols-2">
-          <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Clock className="h-6 w-6" />
             </div>
-            <h3 className="font-display text-xl font-semibold text-card-foreground">Meeting Times</h3>
-            <p className="mt-3 text-muted-foreground">Tuesdays &amp; Thursdays</p>
-            <p className="font-medium text-foreground">3:15 PM – 4:30 PM</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <MapPin className="h-6 w-6" />
+            <div className="overflow-hidden rounded-2xl border border-cream/10 shadow-sm">
+              <div className="aspect-video w-full">
+                <iframe
+                  src="https://www.youtube.com/embed/0V7UpuerAQw"
+                  title="Neuqua Valley Chess teaching at the YMCA"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="h-full w-full border-0"
+                />
+              </div>
             </div>
-            <h3 className="font-display text-xl font-semibold text-card-foreground">Where</h3>
-            <p className="mt-3 text-muted-foreground">Neuqua Valley High School</p>
-            <p className="font-medium text-foreground">Room D200</p>
           </div>
-        </div>
-        <div className="mt-10 text-center">
-          <Link
-            to="/meetings"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            See full meeting details
-          </Link>
         </div>
       </section>
     </div>
