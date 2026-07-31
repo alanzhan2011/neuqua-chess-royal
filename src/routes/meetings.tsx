@@ -1,5 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clock, MapPin, Calendar, Info } from "lucide-react";
+import photoLesson from "../assets/Copy_of_20260127_151044.jpg.asset.json";
+import photoGames from "../assets/Copy_of_20260127_160101.jpg.asset.json";
+import photoRoom from "../assets/Copy_of_20250909_151522.jpg.asset.json";
+
+const photos = [
+  { src: photoLesson.url, alt: "Club members analyzing an endgame study on the classroom smartboard" },
+  { src: photoGames.url, alt: "Two members playing a rated game while others compete in the background" },
+  { src: photoRoom.url, alt: "A full room of Neuqua Valley Chess members playing at a weekly meeting" },
+];
+
 
 export const Route = createFileRoute("/meetings")({
   head: () => ({
@@ -65,7 +75,23 @@ function MeetingsPage() {
           </div>
         </div>
 
+        <div className="mt-16 grid gap-6 md:grid-cols-3">
+          {photos.map((p) => (
+            <div key={p.src} className="overflow-hidden rounded-xl border border-border shadow-sm">
+              <img
+                src={p.src}
+                alt={p.alt}
+                width={1920}
+                height={1080}
+                loading="lazy"
+                className="aspect-[4/3] h-full w-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+
         <div className="mx-auto mt-16 max-w-3xl rounded-xl bg-muted p-8">
+
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Info className="h-6 w-6" />
           </div>
