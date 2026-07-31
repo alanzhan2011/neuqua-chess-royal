@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users, Trophy, Target, Calendar, Clock, MapPin } from "lucide-react";
+import { Users, Trophy, Target, Calendar, Clock, MapPin, ExternalLink } from "lucide-react";
 import heroImage from "../assets/hero-chess.jpg";
 import championsAsset from "../assets/sectional-champions.jpg.asset.json";
+import nctvAsset from "../assets/nctv17-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -140,6 +141,44 @@ function Index() {
           </div>
         </div>
       </section>
+
+      {/* 5th at state */}
+      <section className="w-full border-b border-border bg-muted/40 py-24 md:py-32">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <p className="mb-3 text-sm font-semibold tracking-wide text-accent uppercase">State Finals</p>
+          <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+            5th Place at the IHSA State Tournament
+          </h2>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            After winning the Glenbard West sectional, Neuqua Valley finished fifth at the two-day IHSA state chess
+            tournament — the best finish in program history. Freshman Alan Zhan went 6–1, while Steven Bozue and Carter
+            Hanninen each added five wins and a draw for the Wildcats.
+          </p>
+          <div className="mx-auto mt-10 flex max-w-xl flex-col items-center gap-5 rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <img
+              src={nctvAsset.url}
+              alt="NCTV17 logo"
+              width={62}
+              height={65}
+              loading="lazy"
+              className="h-14 w-auto"
+            />
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              As covered by NCTV17: “Waubonsie Valley finishes as team chess state runner up, Neuqua takes fifth.”
+            </p>
+            <a
+              href="https://www.nctv17.org/sports/waubonsie-valley-finishes-as-team-chess-state-runner-up-neuqua-takes-fifth/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Read the article
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+
 
       {/* What we do */}
       <section className="w-full bg-navy-deep py-24 text-cream md:py-32">
