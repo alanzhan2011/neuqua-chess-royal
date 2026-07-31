@@ -6,6 +6,7 @@
 The fixed nav bar becomes white (light surface) with navy text and gold accent, instead of the current translucent dark bar. It stays fixed and gains a subtle bottom border and shadow so it reads cleanly over the dark hero.
 
 **2. Separate pages instead of one scrolling page**
+
 - `/` — Home: 30-years hero, about highlights, sectional championship section, brief meeting teaser
 - `/meetings` — Meeting times, place, upcoming events
 - `/about` — Club story, what we do
@@ -20,6 +21,7 @@ The homepage hero headline changes to a 30th-anniversary message ("Celebrating 3
 New section on the homepage using the uploaded team photo: a two-column layout with the photo on one side and a "1st Place — IHSA Sectional Champions" headline, short paragraph about the team's first-place finish, and a gold stat/plaque accent. The photo is also reused as the page's social preview image.
 
 **5. Meetings page details**
+
 - When: Tuesdays & Thursdays, 3:15 PM – 4:30 PM
 - Where: Neuqua Valley High School, **Room D200**
 - Upcoming events card retained

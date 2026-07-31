@@ -69,7 +69,9 @@
   --color-navy: var(--navy);
   --color-gold: var(--gold);
   --color-cream: var(--cream);
+  --color-surface: var(--surface);
 }
+
 
 :root {
   --radius: 0.625rem;
@@ -79,6 +81,8 @@
   --navy: oklch(0.40 0.09 230);
   --gold: oklch(0.72 0.13 85);
   --cream: oklch(0.95 0.02 90);
+  --surface: oklch(1 0 0);
+
 
   --background: var(--cream);
   --foreground: var(--navy-deep);
