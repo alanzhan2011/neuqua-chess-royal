@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mail } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/join")({
   head: () => ({
@@ -70,6 +70,31 @@ function JoinPage() {
           ))}
         </div>
       </section>
+
+      <section className="w-full border-t border-border bg-background pb-24">
+        <div className="mx-auto max-w-4xl px-6">
+          <div className="rounded-2xl border border-border bg-card p-10 text-center shadow-sm">
+            <MessageCircle className="mx-auto h-10 w-10 text-accent" />
+            <h2 className="mt-4 font-display text-2xl font-bold text-card-foreground md:text-3xl">
+              Join Our Discord
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+              Our Discord server is where the club lives between meetings — pairings, tournament news, game
+              analysis, and casual online matches.
+            </p>
+            <a
+              href="https://discord.gg/Ng3ME6zBqm"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-accent px-8 py-4 text-base font-semibold text-accent-foreground transition-colors hover:bg-accent/90"
+            >
+              <MessageCircle className="h-5 w-5" />
+              discord.gg/Ng3ME6zBqm
+            </a>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

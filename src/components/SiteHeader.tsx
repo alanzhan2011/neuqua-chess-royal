@@ -3,9 +3,11 @@ import { Link } from "@tanstack/react-router";
 export const navLinks = [
   { label: "Home", to: "/" },
   { label: "Meetings", to: "/meetings" },
+  { label: "Players", to: "/players" },
   { label: "About", to: "/about" },
   { label: "Join", to: "/join" },
 ] as const;
+
 
 export function SiteHeader() {
   return (
@@ -16,7 +18,7 @@ export function SiteHeader() {
         </Link>
         <div className="flex items-center gap-4 md:gap-8">
           <div className="hidden items-center gap-6 sm:flex">
-            {navLinks.slice(0, 3).map((link) => (
+            {navLinks.slice(0, 4).map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
