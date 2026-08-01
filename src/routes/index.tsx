@@ -136,22 +136,17 @@ function Index() {
                 Freshman Alan Zhan went 6–1, while Steven Bozue and Carter Hanninen each added five wins and a draw for
                 the Wildcats.
               </p>
-              <div className="mt-8">
-                <a
-                  href="https://www.nctv17.org/sports/waubonsie-valley-finishes-as-team-chess-state-runner-up-neuqua-takes-fifth/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-                >
-                  Read the article
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </div>
             </div>
-            <div className="flex flex-col items-center gap-5 rounded-2xl border border-border bg-card p-10 shadow-sm">
+            <a
+              href="https://www.nctv17.org/sports/waubonsie-valley-finishes-as-team-chess-state-runner-up-neuqua-takes-fifth/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Read the NCTV17 article about the state tournament"
+              className="flex flex-col items-center gap-5 rounded-2xl border border-border bg-card p-10 shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md"
+            >
               <img
                 src={nctvAsset.url}
-                alt="NCTV17 logo"
+                alt="NCTV17 logo — read the article"
                 width={62}
                 height={65}
                 loading="lazy"
@@ -160,7 +155,10 @@ function Index() {
               <p className="text-center text-sm leading-relaxed text-muted-foreground">
                 As covered by NCTV17: “Waubonsie Valley finishes as team chess state runner up, Neuqua takes fifth.”
               </p>
-            </div>
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
+                Read the article <ExternalLink className="h-4 w-4" />
+              </span>
+            </a>
           </div>
         </div>
       </section>
@@ -169,6 +167,18 @@ function Index() {
       <section className="w-full bg-navy-deep py-24 text-cream md:py-32">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+            <div className="overflow-hidden rounded-2xl border border-cream/10 shadow-sm">
+              <div className="aspect-video w-full">
+                <iframe
+                  src="https://www.youtube.com/embed/0V7UpuerAQw"
+                  title="Neuqua Valley Chess teaching at the YMCA"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="h-full w-full border-0"
+                />
+              </div>
+            </div>
             <div>
               <p className="mb-3 text-sm font-semibold tracking-wide text-gold uppercase">Community</p>
               <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">Teaching Chess at the YMCA</h2>
@@ -186,18 +196,6 @@ function Index() {
                   Watch on YouTube
                   <ExternalLink className="h-4 w-4" />
                 </a>
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-2xl border border-cream/10 shadow-sm">
-              <div className="aspect-video w-full">
-                <iframe
-                  src="https://www.youtube.com/embed/0V7UpuerAQw"
-                  title="Neuqua Valley Chess teaching at the YMCA"
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="h-full w-full border-0"
-                />
               </div>
             </div>
           </div>

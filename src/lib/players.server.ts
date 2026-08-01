@@ -76,7 +76,12 @@ type SheetEntry = { username: string | null; platform: PlayerRating["platform"];
 
 async function fetchSheet(): Promise<Map<string, SheetEntry>> {
   const map = new Map<string, SheetEntry>();
-  const res = await fetch(SHEET_CSV_URL, { redirect: "follow" });
+  // Cache-bust so Google always serves the newest USCF Live values.
+  const res = await fetch(`${SHEET_CSV_URL}&cb=${Date.now()}`, {
+    redirect: "follow",
+    cache: "no-store",
+    headers: { "Cache-Control": "no-cache" },
+  });
   if (!res.ok) return map;
   const rows = parseCsv(await res.text());
   for (const row of rows.slice(1)) {
