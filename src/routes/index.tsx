@@ -167,6 +167,18 @@ function Index() {
       <section className="w-full bg-navy-deep py-24 text-cream md:py-32">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+            <div className="overflow-hidden rounded-2xl border border-cream/10 shadow-sm">
+              <div className="aspect-video w-full">
+                <iframe
+                  src="https://www.youtube.com/embed/0V7UpuerAQw"
+                  title="Neuqua Valley Chess teaching at the YMCA"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="h-full w-full border-0"
+                />
+              </div>
+            </div>
             <div>
               <p className="mb-3 text-sm font-semibold tracking-wide text-gold uppercase">Community</p>
               <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">Teaching Chess at the YMCA</h2>
@@ -184,18 +196,6 @@ function Index() {
                   Watch on YouTube
                   <ExternalLink className="h-4 w-4" />
                 </a>
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-2xl border border-cream/10 shadow-sm">
-              <div className="aspect-video w-full">
-                <iframe
-                  src="https://www.youtube.com/embed/0V7UpuerAQw"
-                  title="Neuqua Valley Chess teaching at the YMCA"
-                  loading="lazy"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="h-full w-full border-0"
-                />
               </div>
             </div>
           </div>
