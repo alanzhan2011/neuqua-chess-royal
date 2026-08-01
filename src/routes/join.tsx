@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mail } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/join")({
   head: () => ({
