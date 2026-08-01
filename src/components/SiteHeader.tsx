@@ -3,9 +3,11 @@ import { Link } from "@tanstack/react-router";
 export const navLinks = [
   { label: "Home", to: "/" },
   { label: "Meetings", to: "/meetings" },
+  { label: "Players", to: "/players" },
   { label: "About", to: "/about" },
   { label: "Join", to: "/join" },
 ] as const;
+
 
 export function SiteHeader() {
   return (
