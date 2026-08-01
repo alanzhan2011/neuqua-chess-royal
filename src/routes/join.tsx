@@ -43,11 +43,11 @@ function JoinPage() {
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <a
-              href="mailto:chess@neuquavalley.org"
+              href="mailto:james_fox@ipsd.org,frank_gambino@ipsd.org?subject=Neuqua%20Valley%20Chess%20Club"
               className="inline-flex items-center justify-center gap-2 rounded-md bg-navy-deep px-8 py-4 text-base font-semibold text-cream transition-colors hover:bg-navy-deep/90"
             >
               <Mail className="h-5 w-5" />
-              Email the Officers
+              Email the Coaches
             </a>
             <Link
               to="/meetings"
@@ -56,6 +56,16 @@ function JoinPage() {
               View Meeting Times
             </Link>
           </div>
+          <p className="mt-6 text-sm text-accent-foreground/80">
+            Coaches:{" "}
+            <a href="mailto:james_fox@ipsd.org" className="font-medium underline underline-offset-4">
+              james_fox@ipsd.org
+            </a>{" "}
+            ·{" "}
+            <a href="mailto:frank_gambino@ipsd.org" className="font-medium underline underline-offset-4">
+              frank_gambino@ipsd.org
+            </a>
+          </p>
         </div>
       </section>
 
