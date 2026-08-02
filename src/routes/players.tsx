@@ -44,6 +44,8 @@ function PlayersPage() {
   });
 
   const players = data?.players ?? [];
+  const totalGamesToday = players.reduce((sum, p) => sum + (p.gamesToday ?? 0), 0);
+  const activePlayers = players.filter((p) => (p.gamesToday ?? 0) > 0);
 
   return (
     <div>
