@@ -44,6 +44,8 @@ function PlayersPage() {
   });
 
   const players = data?.players ?? [];
+  const totalGamesToday = players.reduce((sum, p) => sum + (p.gamesToday ?? 0), 0);
+  const activePlayers = players.filter((p) => (p.gamesToday ?? 0) > 0);
 
   return (
     <div>
@@ -61,6 +63,35 @@ function PlayersPage() {
 
       <section className="w-full bg-background py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-10 grid gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm sm:grid-cols-3">
+            <div>
+              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Games played today</p>
+              <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
+                {isPending ? "—" : totalGamesToday}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">Across all members on chess.com</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Members active</p>
+              <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
+                {isPending ? "—" : activePlayers.length}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">Played at least one game today</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Most active</p>
+              <p className="mt-2 text-sm leading-relaxed text-card-foreground">
+                {isPending || activePlayers.length === 0
+                  ? "No games logged yet today."
+                  : [...activePlayers]
+                      .sort((a, b) => (b.gamesToday ?? 0) - (a.gamesToday ?? 0))
+                      .slice(0, 3)
+                      .map((p) => `${p.name} (${p.gamesToday})`)
+                      .join(", ")}
+              </p>
+            </div>
+          </div>
+
           <div className="mb-4 flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
               {isPending
@@ -82,7 +113,7 @@ function PlayersPage() {
             </p>
           ) : (
             <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-              <table className="w-full min-w-[640px] text-sm">
+              <table className="w-full min-w-[720px] text-sm">
                 <thead>
                   <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-3 text-left font-semibold">Player</th>
@@ -91,6 +122,7 @@ function PlayersPage() {
                     <th className="px-4 py-3 text-right font-semibold">Rapid</th>
                     <th className="px-4 py-3 text-right font-semibold">Blitz</th>
                     <th className="px-4 py-3 text-right font-semibold">Bullet</th>
+                    <th className="px-4 py-3 text-right font-semibold">Today</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -119,12 +151,13 @@ function PlayersPage() {
                       <Cell value={p.rapid} />
                       <Cell value={p.blitz} />
                       <Cell value={p.bullet} />
+                      <Cell value={p.gamesToday} />
                     </tr>
                   ))}
                   {isPending
                     ? Array.from({ length: 6 }).map((_, i) => (
                         <tr key={i} className="border-b border-border/60 last:border-0">
-                          <td colSpan={6} className="px-4 py-3">
+                          <td colSpan={7} className="px-4 py-3">
                             <div className="h-4 w-full animate-pulse rounded bg-muted" />
                           </td>
                         </tr>

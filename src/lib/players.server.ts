@@ -29,6 +29,7 @@ export type PlayerRating = {
   blitz: number | null;
   bullet: number | null;
   uscf: number | null;
+  gamesToday: number | null;
 };
 
 function parseCsv(text: string): string[][] {
@@ -120,6 +121,20 @@ async function fetchChessComRatings(username: string) {
   };
 }
 
+async function fetchGamesToday(username: string): Promise<number | null> {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const res = await fetch(
+    `https://api.chess.com/pub/player/${encodeURIComponent(username)}/games/${year}/${month}`,
+    { headers: { "User-Agent": "NeuquaValleyChessClubSite/1.0" }, redirect: "follow" },
+  );
+  if (!res.ok) return null;
+  const data = (await res.json()) as { games?: Array<{ end_time?: number }> };
+  const startOfDay = Date.UTC(year, now.getUTCMonth(), now.getUTCDate()) / 1000;
+  return (data.games ?? []).filter((g) => (g.end_time ?? 0) >= startOfDay).length;
+}
+
 export async function loadPlayerRatings(): Promise<{ players: PlayerRating[]; updatedAt: string }> {
   let sheet = new Map<string, SheetEntry>();
   try {
@@ -139,11 +154,15 @@ export async function loadPlayerRatings(): Promise<{ players: PlayerRating[]; up
         blitz: null,
         bullet: null,
         uscf: entry?.uscf ?? null,
+        gamesToday: null,
       };
       if (!entry?.username || entry.platform !== "chess.com") return base;
       try {
-        const live = await fetchChessComRatings(entry.username);
-        return { ...base, ...live };
+        const [live, gamesToday] = await Promise.all([
+          fetchChessComRatings(entry.username),
+          fetchGamesToday(entry.username).catch(() => null),
+        ]);
+        return { ...base, ...live, gamesToday };
       } catch (error) {
         console.error(`Failed to fetch chess.com ratings for ${entry.username}`, error);
         return base;

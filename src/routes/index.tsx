@@ -3,6 +3,9 @@ import { ExternalLink } from "lucide-react";
 import heroImage from "../assets/hero-chess.jpg";
 import championsAsset from "../assets/sectional-champions.jpg.asset.json";
 import nctvAsset from "../assets/nctv17-logo.png.asset.json";
+import alumni1 from "../assets/Copy_of_20260108_151825.jpg.asset.json";
+import alumni2 from "../assets/Copy_of_20260108_151513.jpg.asset.json";
+import alumni3 from "../assets/Copy_of_20260108_151831.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -196,6 +199,60 @@ function Index() {
                   Watch on YouTube
                   <ExternalLink className="h-4 w-4" />
                 </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Alumni night */}
+      <section className="w-full border-t border-border bg-background py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+            <div>
+              <p className="mb-3 text-sm font-semibold tracking-wide text-accent uppercase">Alumni Night</p>
+              <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+                Alumni Return to Face the Current Team
+              </h2>
+              <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+                Former Neuqua Valley Chess players came back to the club to take on our current roster across a full
+                night of games — clocks running, handshakes before every board, and plenty of post-game analysis.
+              </p>
+              <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+                Thirty years of players means thirty years of alumni, and nights like this are where the generations of
+                the program meet over the board.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2 overflow-hidden rounded-2xl border border-border shadow-sm">
+                <img
+                  src={alumni1.url}
+                  alt="A Neuqua Valley chess alumnus and a current player shaking hands before their game"
+                  width={1920}
+                  height={1080}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
+                <img
+                  src={alumni2.url}
+                  alt="Players facing off across chess boards during alumni night"
+                  width={1920}
+                  height={1080}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
+                <img
+                  src={alumni3.url}
+                  alt="A full classroom of alumni and current team members playing chess"
+                  width={1920}
+                  height={1080}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
               </div>
             </div>
           </div>
