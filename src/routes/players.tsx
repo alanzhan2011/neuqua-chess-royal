@@ -63,6 +63,35 @@ function PlayersPage() {
 
       <section className="w-full bg-background py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-10 grid gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm sm:grid-cols-3">
+            <div>
+              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Games played today</p>
+              <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
+                {isPending ? "—" : totalGamesToday}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">Across all members on chess.com</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Members active</p>
+              <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
+                {isPending ? "—" : activePlayers.length}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">Played at least one game today</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Most active</p>
+              <p className="mt-2 text-sm leading-relaxed text-card-foreground">
+                {isPending || activePlayers.length === 0
+                  ? "No games logged yet today."
+                  : [...activePlayers]
+                      .sort((a, b) => (b.gamesToday ?? 0) - (a.gamesToday ?? 0))
+                      .slice(0, 3)
+                      .map((p) => `${p.name} (${p.gamesToday})`)
+                      .join(", ")}
+              </p>
+            </div>
+          </div>
+
           <div className="mb-4 flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
               {isPending
