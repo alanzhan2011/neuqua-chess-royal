@@ -113,7 +113,7 @@ function PlayersPage() {
             </p>
           ) : (
             <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-              <table className="w-full min-w-[640px] text-sm">
+              <table className="w-full min-w-[720px] text-sm">
                 <thead>
                   <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-3 text-left font-semibold">Player</th>
@@ -122,6 +122,7 @@ function PlayersPage() {
                     <th className="px-4 py-3 text-right font-semibold">Rapid</th>
                     <th className="px-4 py-3 text-right font-semibold">Blitz</th>
                     <th className="px-4 py-3 text-right font-semibold">Bullet</th>
+                    <th className="px-4 py-3 text-right font-semibold">Today</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -150,12 +151,13 @@ function PlayersPage() {
                       <Cell value={p.rapid} />
                       <Cell value={p.blitz} />
                       <Cell value={p.bullet} />
+                      <Cell value={p.gamesToday} />
                     </tr>
                   ))}
                   {isPending
                     ? Array.from({ length: 6 }).map((_, i) => (
                         <tr key={i} className="border-b border-border/60 last:border-0">
-                          <td colSpan={6} className="px-4 py-3">
+                          <td colSpan={7} className="px-4 py-3">
                             <div className="h-4 w-full animate-pulse rounded bg-muted" />
                           </td>
                         </tr>
