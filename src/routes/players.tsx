@@ -181,13 +181,26 @@ function PlayersPage() {
                     <th className="px-4 py-3 text-right font-semibold">Rapid</th>
                     <th className="px-4 py-3 text-right font-semibold">Blitz</th>
                     <th className="px-4 py-3 text-right font-semibold">Bullet</th>
-                    <th className="px-4 py-3 text-right font-semibold">Today</th>
+                    <th className="px-4 py-3 text-right font-semibold">
+                      {isToday ? "Today" : format(date, "MMM d")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {(isPending ? [] : players).map((p) => (
                     <tr key={p.name} className="border-b border-border/60 last:border-0">
-                      <td className="px-4 py-3 font-medium text-card-foreground">{p.name}</td>
+                      <td className="px-4 py-3 font-medium text-card-foreground">
+                        <a
+                          href={uscfSearchUrl(p.name)}
+                          target="_blank"
+                          rel="noreferrer"
+                          title={`View ${p.name}'s USCF rating page`}
+                          className="underline-offset-4 transition-colors hover:text-accent hover:underline"
+                        >
+                          {p.name}
+                        </a>
+                      </td>
+
                       <td className="px-4 py-3 text-muted-foreground">
                         {p.username ? (
                           p.platform === "chess.com" ? (
