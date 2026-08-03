@@ -121,21 +121,36 @@ async function fetchChessComRatings(username: string) {
   };
 }
 
-async function fetchGamesToday(username: string): Promise<number | null> {
-  const now = new Date();
-  const year = now.getUTCFullYear();
-  const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+async function fetchGamesOnDate(username: string, date: Date): Promise<number | null> {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
   const res = await fetch(
     `https://api.chess.com/pub/player/${encodeURIComponent(username)}/games/${year}/${month}`,
     { headers: { "User-Agent": "NeuquaValleyChessClubSite/1.0" }, redirect: "follow" },
   );
   if (!res.ok) return null;
   const data = (await res.json()) as { games?: Array<{ end_time?: number }> };
-  const startOfDay = Date.UTC(year, now.getUTCMonth(), now.getUTCDate()) / 1000;
-  return (data.games ?? []).filter((g) => (g.end_time ?? 0) >= startOfDay).length;
+  const startOfDay = Date.UTC(year, date.getUTCMonth(), date.getUTCDate()) / 1000;
+  const endOfDay = startOfDay + 86400;
+  return (data.games ?? []).filter((g) => {
+    const t = g.end_time ?? 0;
+    return t >= startOfDay && t < endOfDay;
+  }).length;
 }
 
-export async function loadPlayerRatings(): Promise<{ players: PlayerRating[]; updatedAt: string }> {
+function parseDate(value?: string): Date {
+  if (value) {
+    const [y, m, d] = value.split("-").map(Number);
+    if (y && m && d) return new Date(Date.UTC(y, m - 1, d));
+  }
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
+
+export async function loadPlayerRatings(
+  dateInput?: string,
+): Promise<{ players: PlayerRating[]; updatedAt: string; date: string }> {
+  const date = parseDate(dateInput);
   let sheet = new Map<string, SheetEntry>();
   try {
     sheet = await fetchSheet();
@@ -160,7 +175,7 @@ export async function loadPlayerRatings(): Promise<{ players: PlayerRating[]; up
       try {
         const [live, gamesToday] = await Promise.all([
           fetchChessComRatings(entry.username),
-          fetchGamesToday(entry.username).catch(() => null),
+          fetchGamesOnDate(entry.username, date).catch(() => null),
         ]);
         return { ...base, ...live, gamesToday };
       } catch (error) {
@@ -170,5 +185,10 @@ export async function loadPlayerRatings(): Promise<{ players: PlayerRating[]; up
     }),
   );
 
-  return { players, updatedAt: new Date().toISOString() };
+  return {
+    players,
+    updatedAt: new Date().toISOString(),
+    date: date.toISOString().slice(0, 10),
+  };
 }
+
