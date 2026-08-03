@@ -41,13 +41,10 @@ function Cell({ value }: { value: number | null }) {
   );
 }
 
-// US Chess member search by name — opens the player's MSA rating page listing.
+// US Chess member search by name — opens the player's rating page on the current US Chess site.
 function uscfSearchUrl(name: string) {
-  const parts = name.trim().split(/\s+/);
-  const last = (parts.length > 1 ? parts[parts.length - 1] : parts[0]) ?? name;
-  const first = parts.length > 1 ? parts.slice(0, -1).join(" ") : "";
-  return `https://www.uschess.org/msa/MbrLst.php?${encodeURIComponent(first ? `${last},${first}` : last)}`;
-
+  const query = name.trim().toLowerCase().replace(/\s+/g, "+");
+  return `https://ratings.uschess.org/?fuzzy=${query}`;
 }
 
 function toDateKey(d: Date) {
