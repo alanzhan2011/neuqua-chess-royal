@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { format } from "date-fns";
+import { CalendarIcon, RefreshCw } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 import { getPlayerRatings } from "../lib/players.functions";
 
@@ -34,18 +41,36 @@ function Cell({ value }: { value: number | null }) {
   );
 }
 
+// US Chess member search by name — opens the player's MSA rating page listing.
+function uscfSearchUrl(name: string) {
+  const parts = name.trim().split(/\s+/);
+  const last = parts.length > 1 ? parts[parts.length - 1] : parts[0];
+  const first = parts.length > 1 ? parts.slice(0, -1).join(" ") : "";
+  return `https://www.uschess.org/msa/MbrLst.php?${encodeURIComponent(first ? `${last},${first}` : last)}`;
+}
+
+function toDateKey(d: Date) {
+  return format(d, "yyyy-MM-dd");
+}
+
 function PlayersPage() {
+  const [date, setDate] = useState<Date>(() => new Date());
+  const dateKey = toDateKey(date);
+  const isToday = dateKey === toDateKey(new Date());
+
   const { data, isPending, isFetching, dataUpdatedAt, error } = useQuery({
-    queryKey: ["player-ratings"],
-    queryFn: () => getPlayerRatings(),
-    refetchInterval: 5 * 60 * 1000,
-    refetchOnWindowFocus: true,
+    queryKey: ["player-ratings", dateKey],
+    queryFn: () => getPlayerRatings({ data: { date: dateKey } }),
+    refetchInterval: isToday ? 5 * 60 * 1000 : false,
+    refetchOnWindowFocus: isToday,
     staleTime: 60 * 1000,
   });
 
   const players = data?.players ?? [];
   const totalGamesToday = players.reduce((sum, p) => sum + (p.gamesToday ?? 0), 0);
   const activePlayers = players.filter((p) => (p.gamesToday ?? 0) > 0);
+  const dayLabel = isToday ? "today" : format(date, "MMM d, yyyy");
+
 
   return (
     <div>
