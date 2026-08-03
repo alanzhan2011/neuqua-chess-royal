@@ -44,9 +44,10 @@ function Cell({ value }: { value: number | null }) {
 // US Chess member search by name — opens the player's MSA rating page listing.
 function uscfSearchUrl(name: string) {
   const parts = name.trim().split(/\s+/);
-  const last = parts.length > 1 ? parts[parts.length - 1] : parts[0];
+  const last = (parts.length > 1 ? parts[parts.length - 1] : parts[0]) ?? name;
   const first = parts.length > 1 ? parts.slice(0, -1).join(" ") : "";
   return `https://www.uschess.org/msa/MbrLst.php?${encodeURIComponent(first ? `${last},${first}` : last)}`;
+
 }
 
 function toDateKey(d: Date) {
