@@ -89,9 +89,41 @@ function PlayersPage() {
 
       <section className="w-full bg-background py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-6">
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <span className="text-sm font-semibold text-card-foreground">Games played on</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn("w-[240px] justify-start text-left font-normal")}
+                >
+                  <CalendarIcon />
+                  {format(date, "PPP")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(d) => d && setDate(d)}
+                  disabled={{ after: new Date() }}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+            {!isToday ? (
+              <Button variant="ghost" size="sm" onClick={() => setDate(new Date())}>
+                Back to today
+              </Button>
+            ) : null}
+          </div>
+
           <div className="mb-10 grid gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm sm:grid-cols-3">
             <div>
-              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Games played today</p>
+              <p className="text-sm font-semibold tracking-wide text-accent uppercase">
+                Games played {dayLabel}
+              </p>
               <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
                 {isPending ? "—" : totalGamesToday}
               </p>
@@ -102,13 +134,13 @@ function PlayersPage() {
               <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
                 {isPending ? "—" : activePlayers.length}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">Played at least one game today</p>
+              <p className="mt-1 text-sm text-muted-foreground">Played at least one game {dayLabel}</p>
             </div>
             <div>
               <p className="text-sm font-semibold tracking-wide text-accent uppercase">Most active</p>
               <p className="mt-2 text-sm leading-relaxed text-card-foreground">
                 {isPending || activePlayers.length === 0
-                  ? "No games logged yet today."
+                  ? `No games logged ${dayLabel}.`
                   : [...activePlayers]
                       .sort((a, b) => (b.gamesToday ?? 0) - (a.gamesToday ?? 0))
                       .slice(0, 3)
@@ -132,6 +164,7 @@ function PlayersPage() {
               </span>
             ) : null}
           </div>
+
 
           {error ? (
             <p className="rounded-lg border border-border bg-card p-6 text-muted-foreground">
