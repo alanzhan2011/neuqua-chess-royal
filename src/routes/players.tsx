@@ -117,9 +117,9 @@ function PlayersPage() {
             ) : null}
           </div>
 
-          <div className="mb-10 grid gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm sm:grid-cols-3">
-            <div>
-              <p className="text-sm font-semibold tracking-wide text-accent uppercase">
+          <div className="mb-10 grid gap-px border border-border bg-border sm:grid-cols-3">
+            <div className="bg-card p-8">
+              <p className="text-sm font-semibold tracking-wide text-navy uppercase">
                 Games played {dayLabel}
               </p>
               <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
@@ -127,18 +127,18 @@ function PlayersPage() {
               </p>
               <p className="mt-1 text-sm text-muted-foreground">Across all members on chess.com</p>
             </div>
-            <div>
-              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Members active</p>
+            <div className="bg-card p-8">
+              <p className="text-sm font-semibold tracking-wide text-navy uppercase">Members active</p>
               <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
                 {isPending ? "—" : activePlayers.length}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">Played at least one game {dayLabel}</p>
             </div>
-            <div>
-              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Most active</p>
+            <div className="bg-card p-8">
+              <p className="text-sm font-semibold tracking-wide text-navy uppercase">Most games</p>
               <p className="mt-2 text-sm leading-relaxed text-card-foreground">
                 {isPending || activePlayers.length === 0
-                  ? `No games logged ${dayLabel}.`
+                  ? `Nobody logged a game ${dayLabel}.`
                   : [...activePlayers]
                       .sort((a, b) => (b.gamesToday ?? 0) - (a.gamesToday ?? 0))
                       .slice(0, 3)
@@ -147,6 +147,7 @@ function PlayersPage() {
               </p>
             </div>
           </div>
+
 
           <div className="mb-4 flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
