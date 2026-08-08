@@ -72,17 +72,18 @@ function PlayersPage() {
 
   return (
     <div>
-      <section className="w-full bg-accent py-20 md:py-24">
-        <div className="mx-auto max-w-4xl px-6 text-center">
+      <section className="w-full bg-accent py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-6">
           <h1 className="font-display text-4xl font-bold tracking-tight text-accent-foreground md:text-5xl">
-            Players &amp; Ratings
+            Players and ratings
           </h1>
-          <p className="mt-5 text-lg leading-relaxed text-accent-foreground/80">
-            Our roster with live USCF ratings and chess.com rapid, blitz, and bullet ratings — refreshed
-            automatically.
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-accent-foreground/80">
+            The roster, with USCF ratings and live chess.com rapid, blitz, and bullet numbers. Pick a date to see how
+            many games each person played that day.
           </p>
         </div>
       </section>
+
 
       <section className="w-full bg-background py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-6">
