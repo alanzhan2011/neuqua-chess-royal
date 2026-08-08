@@ -10,17 +10,17 @@ import alumni3 from "../assets/Copy_of_20260108_151831.jpg.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Neuqua Valley Chess | Celebrating 30 Years" },
+      { title: "Neuqua Valley Chess | 30 Years of the Club" },
       {
         name: "description",
         content:
-          "Neuqua Valley Chess Club celebrates 30 years of strategy, competition, and community — 1st place at IHSA Sectionals and 5th at state.",
+          "Neuqua Valley Chess has been meeting since 1996. This year we won IHSA Sectionals and finished 5th at state. We meet Tuesdays and Thursdays in D200.",
       },
-      { property: "og:title", content: "Neuqua Valley Chess | Celebrating 30 Years" },
+      { property: "og:title", content: "Neuqua Valley Chess | 30 Years of the Club" },
       {
         property: "og:description",
         content:
-          "Thirty years of Neuqua Valley Chess — a 1st place IHSA Sectional championship, 5th at state, and chess outreach at the YMCA.",
+          "Thirty years of Neuqua Valley Chess: first at IHSA Sectionals, fifth at state, alumni night, and chess lessons at the YMCA.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
@@ -35,7 +35,7 @@ function Index() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+      <section className="relative flex min-h-screen items-center overflow-hidden">
         <div className="absolute inset-0">
           <img
             src={heroImage}
@@ -46,41 +46,41 @@ function Index() {
           />
           <div className="absolute inset-0 bg-navy-deep/80" />
         </div>
-        <div className="relative mx-auto max-w-5xl px-6 py-32 text-center">
-          <p className="mb-6 inline-block rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 text-sm font-medium tracking-wide text-gold uppercase">
-            30 Years · Est. 1996
+        <div className="relative mx-auto w-full max-w-5xl px-6 py-32">
+          <p className="mb-6 border-l-2 border-gold pl-3 text-sm font-medium tracking-wide text-gold uppercase">
+            Est. 1996
           </p>
           <h1 className="font-display text-4xl font-bold leading-[1.1] tracking-tight text-cream sm:text-5xl md:text-6xl lg:text-7xl">
-            Celebrating 30 Years of
+            30 years of
             <br />
             <span className="text-gold">Neuqua Valley Chess</span>
           </h1>
-          <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-cream/80 md:text-xl">
-            Three decades of players, rivalries, and championships. The board is still set — come make your next move
-            part of our story.
+          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/80 md:text-xl">
+            The club started in 1996 and we still meet twice a week in D200. Some of us are rated, some of us
+            learned the rules last month. Everybody gets a game.
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-10 flex flex-wrap items-center gap-4">
             <Link
               to="/join"
-              className="inline-flex items-center justify-center rounded-md bg-gold px-6 py-3 text-base font-semibold text-navy-deep transition-transform hover:scale-105 hover:bg-gold/90"
+              className="inline-flex items-center justify-center bg-gold px-6 py-3 text-base font-semibold text-navy-deep transition-colors hover:bg-gold/85"
             >
-              Join the Club
+              How to join
             </Link>
             <Link
               to="/meetings"
-              className="inline-flex items-center justify-center rounded-md border border-cream/30 bg-cream/5 px-6 py-3 text-base font-medium text-cream transition-colors hover:bg-cream/10"
+              className="inline-flex items-center justify-center border border-cream/40 px-6 py-3 text-base font-medium text-cream transition-colors hover:bg-cream/10"
             >
-              Meeting Times
+              Meeting times
             </Link>
           </div>
         </div>
       </section>
 
       {/* Sectional champions */}
-      <section className="w-full border-b border-border bg-background py-24 md:py-32">
+      <section className="w-full border-b border-border bg-background py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-            <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
+            <div className="border border-border">
               <img
                 src={championsAsset.url}
                 alt="Neuqua Valley Chess team holding the IHSA Sectional Champions plaque"
@@ -91,53 +91,54 @@ function Index() {
               />
             </div>
             <div>
-              <p className="mb-3 text-sm font-semibold tracking-wide text-accent uppercase">Championship</p>
+              <p className="mb-3 border-b border-border pb-2 text-sm font-semibold tracking-wide text-navy uppercase">
+                Sectionals
+              </p>
               <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-                1st Place at IHSA Sectionals
+                First place at IHSA Sectionals
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                Our team took first place at the IHSA Sectional tournament, bringing home the Sectional Champions plaque
-                after a full day of hard-fought matches across every board.
+                We won the sectional at Glenbard West and took home the plaque. It was a long Saturday — eight boards
+                per round, and the team score came down to the last few games to finish.
               </p>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                Every point came from preparation — countless hours of openings study, tactics drills, and post-game
-                analysis at club meetings.
+                Winning the sectional is what sent us to the state tournament the following weekend.
               </p>
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
-                <div className="rounded-xl bg-muted p-5">
-                  <p className="font-display text-3xl font-bold text-navy">1st</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Sectional finish</p>
+              <dl className="mt-8 divide-y divide-border border-y border-border">
+                <div className="flex items-baseline justify-between py-3">
+                  <dt className="text-muted-foreground">Sectional finish</dt>
+                  <dd className="font-display text-2xl font-bold text-navy">1st</dd>
                 </div>
-                <div className="rounded-xl bg-muted p-5">
-                  <p className="font-display text-3xl font-bold text-navy">30</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Years of chess</p>
+                <div className="flex items-baseline justify-between py-3">
+                  <dt className="text-muted-foreground">Boards per match</dt>
+                  <dd className="font-display text-2xl font-bold text-navy">8</dd>
                 </div>
-                <div className="rounded-xl bg-muted p-5">
-                  <p className="font-display text-3xl font-bold text-navy">8</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Boards competing</p>
+                <div className="flex items-baseline justify-between py-3">
+                  <dt className="text-muted-foreground">Years of the club</dt>
+                  <dd className="font-display text-2xl font-bold text-navy">30</dd>
                 </div>
-              </div>
+              </dl>
             </div>
           </div>
         </div>
       </section>
 
       {/* 5th at state — text left, NCTV17 logo right */}
-      <section className="w-full border-b border-border bg-muted/40 py-24 md:py-32">
+      <section className="w-full border-b border-border bg-muted/40 py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
             <div>
-              <p className="mb-3 text-sm font-semibold tracking-wide text-accent uppercase">State Finals</p>
+              <p className="mb-3 border-b border-border pb-2 text-sm font-semibold tracking-wide text-navy uppercase">
+                State
+              </p>
               <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-                5th Place at the IHSA State Tournament
+                Fifth at the IHSA state tournament
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                After winning the Glenbard West sectional, Neuqua Valley finished fifth at the two-day IHSA state chess
-                tournament — the best finish in program history.
+                Two days, seven rounds, and a fifth place finish — the best the program has ever done at state.
               </p>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                Freshman Alan Zhan went 6–1, while Steven Bozue and Carter Hanninen each added five wins and a draw for
-                the Wildcats.
+                Freshman Alan Zhan went 6–1. Steven Bozue and Carter Hanninen each finished with five wins and a draw.
               </p>
             </div>
             <a
@@ -145,7 +146,7 @@ function Index() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Read the NCTV17 article about the state tournament"
-              className="flex flex-col items-center gap-5 rounded-2xl border border-border bg-card p-10 shadow-sm transition-transform hover:scale-[1.02] hover:shadow-md"
+              className="group flex flex-col items-center gap-5 border border-border bg-card p-10 transition-colors hover:bg-muted/60"
             >
               <img
                 src={nctvAsset.url}
@@ -156,9 +157,9 @@ function Index() {
                 className="h-20 w-auto"
               />
               <p className="text-center text-sm leading-relaxed text-muted-foreground">
-                As covered by NCTV17: “Waubonsie Valley finishes as team chess state runner up, Neuqua takes fifth.”
+                NCTV17 covered it: “Waubonsie Valley finishes as team chess state runner up, Neuqua takes fifth.”
               </p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-navy underline-offset-4 group-hover:underline">
                 Read the article <ExternalLink className="h-4 w-4" />
               </span>
             </a>
@@ -167,10 +168,10 @@ function Index() {
       </section>
 
       {/* YMCA outreach video */}
-      <section className="w-full bg-navy-deep py-24 text-cream md:py-32">
+      <section className="w-full bg-navy-deep py-20 text-cream md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-            <div className="overflow-hidden rounded-2xl border border-cream/10 shadow-sm">
+            <div className="border border-cream/20">
               <div className="aspect-video w-full">
                 <iframe
                   src="https://www.youtube.com/embed/0V7UpuerAQw"
@@ -183,18 +184,20 @@ function Index() {
               </div>
             </div>
             <div>
-              <p className="mb-3 text-sm font-semibold tracking-wide text-gold uppercase">Community</p>
-              <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">Teaching Chess at the YMCA</h2>
+              <p className="mb-3 border-b border-cream/20 pb-2 text-sm font-semibold tracking-wide text-gold uppercase">
+                YMCA
+              </p>
+              <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">Teaching chess at the YMCA</h2>
               <p className="mt-6 text-lg leading-relaxed text-cream/70">
-                Our members volunteer at the local YMCA, teaching kids the rules, tactics, and joy of chess — passing the
-                game on to the next generation of players.
+                Members go over to the local YMCA and teach kids how to play. Mostly the rules and basic tactics, and a
+                lot of games where the kids beat us.
               </p>
               <div className="mt-8">
                 <a
                   href="https://www.youtube.com/watch?v=0V7UpuerAQw"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-semibold text-navy-deep transition-colors hover:bg-gold/90"
+                  className="inline-flex items-center gap-2 bg-gold px-5 py-2.5 text-sm font-semibold text-navy-deep transition-colors hover:bg-gold/85"
                 >
                   Watch on YouTube
                   <ExternalLink className="h-4 w-4" />
@@ -206,25 +209,27 @@ function Index() {
       </section>
 
       {/* Alumni night */}
-      <section className="w-full border-t border-border bg-background py-24 md:py-32">
+      <section className="w-full border-t border-border bg-background py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-            <div>
-              <p className="mb-3 text-sm font-semibold tracking-wide text-accent uppercase">Alumni Night</p>
+            <div className="order-2 lg:order-1">
+              <p className="mb-3 border-b border-border pb-2 text-sm font-semibold tracking-wide text-navy uppercase">
+                Alumni night
+              </p>
               <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-                Alumni Return to Face the Current Team
+                Alumni came back to play the team
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-                Former Neuqua Valley Chess players came back to the club to take on our current roster across a full
-                night of games — clocks running, handshakes before every board, and plenty of post-game analysis.
+                Former players showed up for a night of games against the current roster. Clocks running, handshakes
+                first, and a lot of arguing about moves afterward.
               </p>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                Thirty years of players means thirty years of alumni, and nights like this are where the generations of
-                the program meet over the board.
+                Thirty years of the club means a lot of alumni, and nights like this are when they come through the door
+                again.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2 overflow-hidden rounded-2xl border border-border shadow-sm">
+            <div className="order-1 grid grid-cols-2 gap-3 lg:order-2">
+              <div className="col-span-2 border border-border">
                 <img
                   src={alumni1.url}
                   alt="A Neuqua Valley chess alumnus and a current player shaking hands before their game"
@@ -234,7 +239,7 @@ function Index() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
+              <div className="border border-border">
                 <img
                   src={alumni2.url}
                   alt="Players facing off across chess boards during alumni night"
@@ -244,7 +249,7 @@ function Index() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="overflow-hidden rounded-2xl border border-border shadow-sm">
+              <div className="border border-border">
                 <img
                   src={alumni3.url}
                   alt="A full classroom of alumni and current team members playing chess"
