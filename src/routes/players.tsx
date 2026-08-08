@@ -166,11 +166,11 @@ function PlayersPage() {
 
 
           {error ? (
-            <p className="rounded-lg border border-border bg-card p-6 text-muted-foreground">
-              Ratings are temporarily unavailable. They'll refresh automatically.
+            <p className="border border-border bg-card p-6 text-muted-foreground">
+              Ratings did not load this time. They try again automatically.
             </p>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
+            <div className="overflow-x-auto border border-border bg-card">
               <table className="w-full min-w-[720px] text-sm">
                 <thead>
                   <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
@@ -194,7 +194,7 @@ function PlayersPage() {
                           target="_blank"
                           rel="noreferrer"
                           title={`View ${p.name}'s USCF rating page`}
-                          className="underline-offset-4 transition-colors hover:text-accent hover:underline"
+                          className="underline-offset-4 transition-colors hover:text-navy hover:underline"
                         >
                           {p.name}
                         </a>
@@ -207,7 +207,7 @@ function PlayersPage() {
                               href={`https://www.chess.com/member/${p.username}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="underline-offset-4 transition-colors hover:text-accent hover:underline"
+                              className="underline-offset-4 transition-colors hover:text-navy hover:underline"
                             >
                               {p.username}
                             </a>
@@ -229,7 +229,7 @@ function PlayersPage() {
                     ? Array.from({ length: 6 }).map((_, i) => (
                         <tr key={i} className="border-b border-border/60 last:border-0">
                           <td colSpan={7} className="px-4 py-3">
-                            <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                            <div className="h-4 w-full animate-pulse bg-muted" />
                           </td>
                         </tr>
                       ))
@@ -240,8 +240,8 @@ function PlayersPage() {
           )}
 
           <p className="mt-4 text-xs text-muted-foreground">
-            Rapid, blitz, and bullet come live from the chess.com public API. USCF ratings come from the
-            club's live rating sheet.
+            Rapid, blitz, and bullet come straight from the chess.com public API. USCF ratings come from the
+            club's rating sheet. Click a name to look it up on the US Chess site.
           </p>
         </div>
       </section>
