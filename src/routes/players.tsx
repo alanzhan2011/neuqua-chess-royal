@@ -72,17 +72,18 @@ function PlayersPage() {
 
   return (
     <div>
-      <section className="w-full bg-accent py-20 md:py-24">
-        <div className="mx-auto max-w-4xl px-6 text-center">
+      <section className="w-full bg-accent py-16 md:py-20">
+        <div className="mx-auto max-w-6xl px-6">
           <h1 className="font-display text-4xl font-bold tracking-tight text-accent-foreground md:text-5xl">
-            Players &amp; Ratings
+            Players and ratings
           </h1>
-          <p className="mt-5 text-lg leading-relaxed text-accent-foreground/80">
-            Our roster with live USCF ratings and chess.com rapid, blitz, and bullet ratings — refreshed
-            automatically.
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-accent-foreground/80">
+            The roster, with USCF ratings and live chess.com rapid, blitz, and bullet numbers. Pick a date to see how
+            many games each person played that day.
           </p>
         </div>
       </section>
+
 
       <section className="w-full bg-background py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-6">
@@ -116,9 +117,9 @@ function PlayersPage() {
             ) : null}
           </div>
 
-          <div className="mb-10 grid gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm sm:grid-cols-3">
-            <div>
-              <p className="text-sm font-semibold tracking-wide text-accent uppercase">
+          <div className="mb-10 grid gap-px border border-border bg-border sm:grid-cols-3">
+            <div className="bg-card p-8">
+              <p className="text-sm font-semibold tracking-wide text-navy uppercase">
                 Games played {dayLabel}
               </p>
               <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
@@ -126,18 +127,18 @@ function PlayersPage() {
               </p>
               <p className="mt-1 text-sm text-muted-foreground">Across all members on chess.com</p>
             </div>
-            <div>
-              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Members active</p>
+            <div className="bg-card p-8">
+              <p className="text-sm font-semibold tracking-wide text-navy uppercase">Members active</p>
               <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
                 {isPending ? "—" : activePlayers.length}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">Played at least one game {dayLabel}</p>
             </div>
-            <div>
-              <p className="text-sm font-semibold tracking-wide text-accent uppercase">Most active</p>
+            <div className="bg-card p-8">
+              <p className="text-sm font-semibold tracking-wide text-navy uppercase">Most games</p>
               <p className="mt-2 text-sm leading-relaxed text-card-foreground">
                 {isPending || activePlayers.length === 0
-                  ? `No games logged ${dayLabel}.`
+                  ? `Nobody logged a game ${dayLabel}.`
                   : [...activePlayers]
                       .sort((a, b) => (b.gamesToday ?? 0) - (a.gamesToday ?? 0))
                       .slice(0, 3)
@@ -146,6 +147,7 @@ function PlayersPage() {
               </p>
             </div>
           </div>
+
 
           <div className="mb-4 flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
@@ -164,11 +166,11 @@ function PlayersPage() {
 
 
           {error ? (
-            <p className="rounded-lg border border-border bg-card p-6 text-muted-foreground">
-              Ratings are temporarily unavailable. They'll refresh automatically.
+            <p className="border border-border bg-card p-6 text-muted-foreground">
+              Ratings did not load this time. They try again automatically.
             </p>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
+            <div className="overflow-x-auto border border-border bg-card">
               <table className="w-full min-w-[720px] text-sm">
                 <thead>
                   <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
@@ -192,7 +194,7 @@ function PlayersPage() {
                           target="_blank"
                           rel="noreferrer"
                           title={`View ${p.name}'s USCF rating page`}
-                          className="underline-offset-4 transition-colors hover:text-accent hover:underline"
+                          className="underline-offset-4 transition-colors hover:text-navy hover:underline"
                         >
                           {p.name}
                         </a>
@@ -205,7 +207,7 @@ function PlayersPage() {
                               href={`https://www.chess.com/member/${p.username}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="underline-offset-4 transition-colors hover:text-accent hover:underline"
+                              className="underline-offset-4 transition-colors hover:text-navy hover:underline"
                             >
                               {p.username}
                             </a>
@@ -227,7 +229,7 @@ function PlayersPage() {
                     ? Array.from({ length: 6 }).map((_, i) => (
                         <tr key={i} className="border-b border-border/60 last:border-0">
                           <td colSpan={7} className="px-4 py-3">
-                            <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                            <div className="h-4 w-full animate-pulse bg-muted" />
                           </td>
                         </tr>
                       ))
@@ -238,8 +240,8 @@ function PlayersPage() {
           )}
 
           <p className="mt-4 text-xs text-muted-foreground">
-            Rapid, blitz, and bullet come live from the chess.com public API. USCF ratings come from the
-            club's live rating sheet.
+            Rapid, blitz, and bullet come straight from the chess.com public API. USCF ratings come from the
+            club's rating sheet. Click a name to look it up on the US Chess site.
           </p>
         </div>
       </section>
