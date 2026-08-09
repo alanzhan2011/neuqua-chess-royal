@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as MeetingsRouteImport } from './routes/meetings'
 import { Route as PlayersRouteImport } from './routes/players'
+import { Route as PlayersStatsRouteImport } from './routes/players/stats'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,20 +41,27 @@ const PlayersRoute = PlayersRouteImport.update({
   path: '/players',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayersStatsRoute = PlayersStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => PlayersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/meetings': typeof MeetingsRoute
-  '/players': typeof PlayersRoute
+  '/players': typeof PlayersRouteWithChildren
+  '/players/stats': typeof PlayersStatsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/meetings': typeof MeetingsRoute
-  '/players': typeof PlayersRoute
+  '/players': typeof PlayersRouteWithChildren
+  '/players/stats': typeof PlayersStatsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,14 +69,23 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/meetings': typeof MeetingsRoute
-  '/players': typeof PlayersRoute
+  '/players': typeof PlayersRouteWithChildren
+  '/players/stats': typeof PlayersStatsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/join' | '/meetings' | '/players'
+  fullPaths:
+    '/' | '/about' | '/join' | '/meetings' | '/players' | '/players/stats'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/join' | '/meetings' | '/players'
-  id: '__root__' | '/' | '/about' | '/join' | '/meetings' | '/players'
+  to: '/' | '/about' | '/join' | '/meetings' | '/players' | '/players/stats'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/join'
+    | '/meetings'
+    | '/players'
+    | '/players/stats'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,7 +93,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   JoinRoute: typeof JoinRoute
   MeetingsRoute: typeof MeetingsRoute
-  PlayersRoute: typeof PlayersRoute
+  PlayersRoute: typeof PlayersRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -116,26 +133,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/players/stats': {
+      id: '/players/stats'
+      path: '/stats'
+      fullPath: '/players/stats'
+      preLoaderRoute: typeof PlayersStatsRouteImport
+      parentRoute: typeof PlayersRoute
+    }
   }
 }
+
+interface PlayersRouteChildren {
+  PlayersStatsRoute: typeof PlayersStatsRoute
+}
+
+const PlayersRouteChildren: PlayersRouteChildren = {
+  PlayersStatsRoute: PlayersStatsRoute,
+}
+
+const PlayersRouteWithChildren =
+  PlayersRoute._addFileChildren(PlayersRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   JoinRoute: JoinRoute,
   MeetingsRoute: MeetingsRoute,
-  PlayersRoute: PlayersRoute,
+  PlayersRoute: PlayersRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
