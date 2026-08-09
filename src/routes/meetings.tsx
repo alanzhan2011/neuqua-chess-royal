@@ -16,12 +16,12 @@ export const Route = createFileRoute("/meetings")({
       {
         name: "description",
         content:
-          "Neuqua Valley Chess meets Tuesdays and Thursdays from 3:15 to 4:30 PM in Room D200. Walk in any week, no sign-up needed.",
+          "Neuqua Valley Chess meets Tuesdays and Thursdays from 3:15 to 4:30 PM in Room D221. Walk in any week, no sign-up needed.",
       },
       { property: "og:title", content: "Meeting Times | Neuqua Valley Chess" },
       {
         property: "og:description",
-        content: "Tuesdays and Thursdays, 3:15 to 4:30 PM, Room D200. Boards and clocks are here, just show up.",
+        content: "Tuesdays and Thursdays, 3:15 to 4:30 PM, Room D221. Boards and clocks are here, just show up.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/meetings" },
@@ -41,7 +41,7 @@ function MeetingsPage() {
             Meetings
           </p>
           <h1 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-            Tuesdays and Thursdays, D200
+            Tuesdays and Thursdays, D221
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
             No sign-up, no dues to pay at the door. Come down after 8th period and find an open board.
@@ -59,7 +59,7 @@ function MeetingsPage() {
           </div>
           <div className="bg-card p-8">
             <dt className="text-sm font-semibold tracking-wide text-navy uppercase">Room</dt>
-            <dd className="font-display mt-2 text-2xl font-bold text-card-foreground">D200</dd>
+            <dd className="font-display mt-2 text-2xl font-bold text-card-foreground">D221</dd>
           </div>
         </dl>
 
