@@ -13,7 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as MeetingsRouteImport } from './routes/meetings'
-import { Route as PlayersRouteImport } from './routes/players'
+import { Route as PlayersIndexRouteImport } from './routes/players/index'
 import { Route as PlayersStatsRouteImport } from './routes/players/stats'
 
 const IndexRoute = IndexRouteImport.update({
@@ -36,15 +36,15 @@ const MeetingsRoute = MeetingsRouteImport.update({
   path: '/meetings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlayersRoute = PlayersRouteImport.update({
-  id: '/players',
-  path: '/players',
+const PlayersIndexRoute = PlayersIndexRouteImport.update({
+  id: '/players/',
+  path: '/players/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlayersStatsRoute = PlayersStatsRouteImport.update({
-  id: '/stats',
-  path: '/stats',
-  getParentRoute: () => PlayersRoute,
+  id: '/players/stats',
+  path: '/players/stats',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -52,16 +52,16 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/meetings': typeof MeetingsRoute
-  '/players': typeof PlayersRouteWithChildren
   '/players/stats': typeof PlayersStatsRoute
+  '/players/': typeof PlayersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/meetings': typeof MeetingsRoute
-  '/players': typeof PlayersRouteWithChildren
   '/players/stats': typeof PlayersStatsRoute
+  '/players': typeof PlayersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,23 +69,23 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/meetings': typeof MeetingsRoute
-  '/players': typeof PlayersRouteWithChildren
   '/players/stats': typeof PlayersStatsRoute
+  '/players/': typeof PlayersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/join' | '/meetings' | '/players' | '/players/stats'
+    '/' | '/about' | '/join' | '/meetings' | '/players/stats' | '/players/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/join' | '/meetings' | '/players' | '/players/stats'
+  to: '/' | '/about' | '/join' | '/meetings' | '/players/stats' | '/players'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/join'
     | '/meetings'
-    | '/players'
     | '/players/stats'
+    | '/players/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,7 +93,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   JoinRoute: typeof JoinRoute
   MeetingsRoute: typeof MeetingsRoute
-  PlayersRoute: typeof PlayersRouteWithChildren
+  PlayersStatsRoute: typeof PlayersStatsRoute
+  PlayersIndexRoute: typeof PlayersIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -126,40 +127,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MeetingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/players': {
-      id: '/players'
+    '/players/': {
+      id: '/players/'
       path: '/players'
-      fullPath: '/players'
-      preLoaderRoute: typeof PlayersRouteImport
+      fullPath: '/players/'
+      preLoaderRoute: typeof PlayersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/players/stats': {
       id: '/players/stats'
-      path: '/stats'
+      path: '/players/stats'
       fullPath: '/players/stats'
       preLoaderRoute: typeof PlayersStatsRouteImport
-      parentRoute: typeof PlayersRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface PlayersRouteChildren {
-  PlayersStatsRoute: typeof PlayersStatsRoute
-}
-
-const PlayersRouteChildren: PlayersRouteChildren = {
-  PlayersStatsRoute: PlayersStatsRoute,
-}
-
-const PlayersRouteWithChildren =
-  PlayersRoute._addFileChildren(PlayersRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   JoinRoute: JoinRoute,
   MeetingsRoute: MeetingsRoute,
-  PlayersRoute: PlayersRouteWithChildren,
+  PlayersStatsRoute: PlayersStatsRoute,
+  PlayersIndexRoute: PlayersIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
