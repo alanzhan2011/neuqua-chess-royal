@@ -9,6 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
+import { clubTodayDate, clubTodayKey } from "@/lib/club-time";
 import { getPlayerRatings } from "@/lib/players.functions";
 
 export const Route = createFileRoute("/players/stats")({
@@ -55,9 +56,9 @@ function toDateKey(d: Date) {
 }
 
 function PlayerStatsPage() {
-  const [date, setDate] = useState<Date>(() => new Date());
+  const [date, setDate] = useState<Date>(clubTodayDate);
   const dateKey = toDateKey(date);
-  const isToday = dateKey === toDateKey(new Date());
+  const isToday = dateKey === clubTodayKey();
 
   const { data, isPending, isFetching, error } = useQuery({
     queryKey: ["player-ratings", dateKey],
@@ -122,14 +123,14 @@ function PlayerStatsPage() {
                   mode="single"
                   selected={date}
                   onSelect={(d) => d && setDate(d)}
-                  disabled={{ after: new Date() }}
+                  disabled={{ after: clubTodayDate() }}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                 />
               </PopoverContent>
             </Popover>
             {!isToday ? (
-              <Button variant="ghost" size="sm" onClick={() => setDate(new Date())}>
+              <Button variant="ghost" size="sm" onClick={() => setDate(clubTodayDate())}>
                 Back to today
               </Button>
             ) : null}
