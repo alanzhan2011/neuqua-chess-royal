@@ -115,6 +115,12 @@ function PlayersPage() {
                 Back to today
               </Button>
             ) : null}
+            <Link
+              to="/players/stats"
+              className="ml-auto border border-border px-4 py-2 text-sm font-semibold text-card-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              Daily rating stats
+            </Link>
           </div>
 
           <div className="mb-10 grid gap-px border border-border bg-border sm:grid-cols-3">
