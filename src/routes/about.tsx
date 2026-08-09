@@ -11,7 +11,7 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "What the Neuqua Valley Chess Club actually does: two meetings a week in D200, casual and rated games, lessons, and tournaments on weekends.",
+          "What the Neuqua Valley Chess Club actually does: two meetings a week in D221, casual and rated games, lessons, and tournaments on weekends.",
       },
       { property: "og:title", content: "About the Club | Neuqua Valley Chess" },
       {
@@ -58,7 +58,7 @@ function AboutPage() {
             More than just a club
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
-            It is a room in D200 with about thirty people in it, boards on every table, and a lot of noise until the
+            It is a room in D221 with about thirty people in it, boards on every table, and a lot of noise until the
             clocks start. Some members are chasing a USCF rating. Some just like having somewhere to be after school.
             Both are fine. The club has run this way for 30 years.
           </p>

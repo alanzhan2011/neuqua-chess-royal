@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Neuqua Valley Chess has been meeting since 1996. This year we won IHSA Sectionals and finished 5th at state. We meet Tuesdays and Thursdays in D200.",
+          "Neuqua Valley Chess has been meeting since 1996. This year we won IHSA Sectionals and finished 5th at state. We meet Tuesdays and Thursdays in D221.",
       },
       { property: "og:title", content: "Neuqua Valley Chess | 30 Years of the Club" },
       {
@@ -56,7 +56,7 @@ function Index() {
             <span className="text-gold">Neuqua Valley Chess</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/80 md:text-xl">
-            The club started in 1996 and we still meet twice a week in D200. Some of us are rated, some of us
+            The club started in 1996 and we still meet twice a week in D221. Some of us are rated, some of us
             learned the rules last month. Everybody gets a game.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">

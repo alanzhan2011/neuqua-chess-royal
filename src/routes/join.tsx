@@ -8,12 +8,12 @@ export const Route = createFileRoute("/join")({
       {
         name: "description",
         content:
-          "Joining Neuqua Valley Chess takes one step: show up to Room D200 on a Tuesday or Thursday at 3:15. Coach emails and the club Discord are here too.",
+          "Joining Neuqua Valley Chess takes one step: show up to Room D221 on a Tuesday or Thursday at 3:15. Coach emails and the club Discord are here too.",
       },
       { property: "og:title", content: "How to Join | Neuqua Valley Chess" },
       {
         property: "og:description",
-        content: "Show up Tuesday or Thursday in Room D200 at 3:15, or email the coaches. The Discord link is here.",
+        content: "Show up Tuesday or Thursday in Room D221 at 3:15, or email the coaches. The Discord link is here.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/join" },
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/join")({
 });
 
 const steps = [
-  { n: "1", title: "Just show up", text: "Room D200, Tuesday or Thursday, 3:15. You do not need to tell anyone first." },
+  { n: "1", title: "Just show up", text: "Room D221, Tuesday or Thursday, 3:15. You do not need to tell anyone first." },
   { n: "2", title: "Play someone", text: "We will put you on a board against somebody around your level." },
   { n: "3", title: "Keep coming", text: "After that you can enter the club ladder, tournaments, and team matches." },
 ];
@@ -39,7 +39,7 @@ function JoinPage() {
             Joining is one step
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-accent-foreground/80">
-            Walk into D200 after school on a Tuesday or Thursday. That is the whole process. If you would rather ask
+            Walk into D221 after school on a Tuesday or Thursday. That is the whole process. If you would rather ask
             first, email one of the coaches.
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-4">

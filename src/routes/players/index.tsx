@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { format } from "date-fns";
@@ -9,9 +9,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-import { getPlayerRatings } from "../lib/players.functions";
+import { clubTodayDate, clubTodayKey } from "@/lib/club-time";
+import { getPlayerRatings } from "@/lib/players.functions";
 
-export const Route = createFileRoute("/players")({
+export const Route = createFileRoute("/players/")({
   head: () => ({
     meta: [
       { title: "Players & Ratings — Neuqua Valley Chess" },
@@ -52,9 +53,9 @@ function toDateKey(d: Date) {
 }
 
 function PlayersPage() {
-  const [date, setDate] = useState<Date>(() => new Date());
+  const [date, setDate] = useState<Date>(clubTodayDate);
   const dateKey = toDateKey(date);
-  const isToday = dateKey === toDateKey(new Date());
+  const isToday = dateKey === clubTodayKey();
 
   const { data, isPending, isFetching, dataUpdatedAt, error } = useQuery({
     queryKey: ["player-ratings", dateKey],
@@ -104,17 +105,23 @@ function PlayersPage() {
                   mode="single"
                   selected={date}
                   onSelect={(d) => d && setDate(d)}
-                  disabled={{ after: new Date() }}
+                  disabled={{ after: clubTodayDate() }}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                 />
               </PopoverContent>
             </Popover>
             {!isToday ? (
-              <Button variant="ghost" size="sm" onClick={() => setDate(new Date())}>
+              <Button variant="ghost" size="sm" onClick={() => setDate(clubTodayDate())}>
                 Back to today
               </Button>
             ) : null}
+            <Link
+              to="/players/stats"
+              className="ml-auto border border-border px-4 py-2 text-sm font-semibold text-card-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              Daily rating stats
+            </Link>
           </div>
 
           <div className="mb-10 grid gap-px border border-border bg-border sm:grid-cols-3">

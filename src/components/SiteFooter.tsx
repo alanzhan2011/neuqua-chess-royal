@@ -10,7 +10,7 @@ export function SiteFooter() {
             Neuqua Valley <span className="text-navy">Chess</span>
           </Link>
           <p className="mt-1 text-sm text-muted-foreground">
-            Room D200, Neuqua Valley High School · since 1996 · © {new Date().getFullYear()}
+            Room D221, Neuqua Valley High School · since 1996 · © {new Date().getFullYear()}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-5">

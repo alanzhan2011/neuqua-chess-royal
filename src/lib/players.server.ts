@@ -3,6 +3,9 @@
 const SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/1wpQjFiQBnvtw0Kn-HRbfxezmCIhJonHTZdILNLiUzHs/export?format=csv&gid=0";
 
+// The club is in Illinois, so "today" means a Central-time day, not a UTC one.
+const CLUB_TIME_ZONE = "America/Chicago";
+
 // Club members, in roster order. Only these names are shown on the site.
 export const ROSTER = [
   "Adarsh Girish",
@@ -21,6 +24,18 @@ export const ROSTER = [
   "Rishaan Chowdury",
 ] as const;
 
+export type CategoryKey = "rapid" | "blitz" | "bullet";
+
+export type CategoryDay = {
+  games: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  start: number | null;
+  end: number | null;
+  delta: number | null;
+};
+
 export type PlayerRating = {
   name: string;
   username: string | null;
@@ -30,7 +45,16 @@ export type PlayerRating = {
   bullet: number | null;
   uscf: number | null;
   gamesToday: number | null;
+  day: Record<CategoryKey, CategoryDay> | null;
 };
+
+function emptyDay(): CategoryDay {
+  return { games: 0, wins: 0, losses: 0, draws: 0, start: null, end: null, delta: null };
+}
+
+function emptyDayMap(): Record<CategoryKey, CategoryDay> {
+  return { rapid: emptyDay(), blitz: emptyDay(), bullet: emptyDay() };
+}
 
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
@@ -106,9 +130,11 @@ async function fetchSheet(): Promise<Map<string, SheetEntry>> {
 
 type ChessComStats = Record<string, { last?: { rating?: number } } | undefined>;
 
+const UA = { "User-Agent": "NeuquaValleyChessClubSite/1.0" };
+
 async function fetchChessComRatings(username: string) {
   const res = await fetch(`https://api.chess.com/pub/player/${encodeURIComponent(username)}/stats`, {
-    headers: { "User-Agent": "NeuquaValleyChessClubSite/1.0" },
+    headers: UA,
     redirect: "follow",
   });
   if (!res.ok) return { rapid: null, blitz: null, bullet: null };
@@ -121,36 +147,162 @@ async function fetchChessComRatings(username: string) {
   };
 }
 
-async function fetchGamesOnDate(username: string, date: Date): Promise<number | null> {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const res = await fetch(
-    `https://api.chess.com/pub/player/${encodeURIComponent(username)}/games/${year}/${month}`,
-    { headers: { "User-Agent": "NeuquaValleyChessClubSite/1.0" }, redirect: "follow" },
+// ---- time zone helpers ----------------------------------------------------
+
+function zoneOffsetMs(instant: number, timeZone: string): number {
+  const dtf = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const parts: Record<string, number> = {};
+  for (const p of dtf.formatToParts(new Date(instant))) {
+    if (p.type !== "literal") parts[p.type] = Number(p.value);
+  }
+  const asUtc = Date.UTC(
+    parts["year"]!,
+    (parts["month"] ?? 1) - 1,
+    parts["day"] ?? 1,
+    (parts["hour"] ?? 0) % 24,
+    parts["minute"] ?? 0,
+    parts["second"] ?? 0,
   );
-  if (!res.ok) return null;
-  const data = (await res.json()) as { games?: Array<{ end_time?: number }> };
-  const startOfDay = Date.UTC(year, date.getUTCMonth(), date.getUTCDate()) / 1000;
-  const endOfDay = startOfDay + 86400;
-  return (data.games ?? []).filter((g) => {
-    const t = g.end_time ?? 0;
-    return t >= startOfDay && t < endOfDay;
-  }).length;
+  return asUtc - instant;
 }
 
-function parseDate(value?: string): Date {
-  if (value) {
-    const [y, m, d] = value.split("-").map(Number);
-    if (y && m && d) return new Date(Date.UTC(y, m - 1, d));
+// Epoch ms for local midnight of y-m-d in the club's time zone.
+function zonedStartOfDay(y: number, m: number, d: number): number {
+  const naive = Date.UTC(y, m - 1, d);
+  let ts = naive - zoneOffsetMs(naive, CLUB_TIME_ZONE);
+  // Re-resolve once in case the first guess landed on the other side of a DST shift.
+  ts = naive - zoneOffsetMs(ts, CLUB_TIME_ZONE);
+  return ts;
+}
+
+function todayKeyInZone(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: CLUB_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function resolveDay(value?: string): { key: string; startSec: number; endSec: number } {
+  const key = value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : todayKeyInZone();
+  const [y, m, d] = key.split("-").map(Number) as [number, number, number];
+  const start = zonedStartOfDay(y, m, d);
+  const end = zonedStartOfDay(y, m, d + 1);
+  return { key, startSec: Math.floor(start / 1000), endSec: Math.floor(end / 1000) };
+}
+
+// ---- chess.com game archives --------------------------------------------
+
+type ArchiveGame = {
+  end_time?: number;
+  time_class?: string;
+  rules?: string;
+  white?: { username?: string; rating?: number; result?: string };
+  black?: { username?: string; rating?: number; result?: string };
+};
+
+function monthsToFetch(startSec: number, endSec: number): Array<{ y: number; m: number }> {
+  const seen = new Set<string>();
+  const out: Array<{ y: number; m: number }> = [];
+  // Cover both UTC months the local day can touch.
+  for (const ts of [startSec, endSec - 1]) {
+    const d = new Date(ts * 1000);
+    const y = d.getUTCFullYear();
+    const m = d.getUTCMonth() + 1;
+    const key = `${y}-${m}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      out.push({ y, m });
+    }
   }
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  return out;
+}
+
+async function fetchArchiveMonth(username: string, y: number, m: number): Promise<ArchiveGame[]> {
+  const res = await fetch(
+    `https://api.chess.com/pub/player/${encodeURIComponent(username)}/games/${y}/${String(m).padStart(2, "0")}`,
+    { headers: UA, redirect: "follow", cache: "no-store" },
+  );
+  if (!res.ok) return [];
+  const data = (await res.json()) as { games?: ArchiveGame[] };
+  return data.games ?? [];
+}
+
+const CATEGORY_BY_TIME_CLASS: Record<string, CategoryKey> = {
+  rapid: "rapid",
+  blitz: "blitz",
+  bullet: "bullet",
+};
+
+async function fetchDayBreakdown(
+  username: string,
+  startSec: number,
+  endSec: number,
+): Promise<{ total: number; day: Record<CategoryKey, CategoryDay> }> {
+  const months = monthsToFetch(startSec, endSec);
+  const lists = await Promise.all(months.map((mm) => fetchArchiveMonth(username, mm.y, mm.m)));
+  const games = lists
+    .flat()
+    .filter((g) => (g.rules ?? "chess") === "chess")
+    .sort((a, b) => (a.end_time ?? 0) - (b.end_time ?? 0));
+
+  const day = emptyDayMap();
+  // Rating right before the day started, per category (used as the day's baseline).
+  const priorRating: Partial<Record<CategoryKey, number>> = {};
+  const lower = username.toLowerCase();
+
+  for (const g of games) {
+    const category = CATEGORY_BY_TIME_CLASS[g.time_class ?? ""];
+    if (!category) continue;
+    const isWhite = (g.white?.username ?? "").toLowerCase() === lower;
+    const me = isWhite ? g.white : g.black;
+    const rating = me?.rating ?? null;
+    const end = g.end_time ?? 0;
+
+    if (end < startSec) {
+      if (rating != null) priorRating[category] = rating;
+      continue;
+    }
+    if (end >= endSec) continue;
+
+    const bucket = day[category];
+    bucket.games += 1;
+    const result = me?.result ?? "";
+    if (result === "win") bucket.wins += 1;
+    else if (result === "agreed" || result === "repetition" || result === "stalemate" ||
+             result === "insufficient" || result === "50move" || result === "timevsinsufficient")
+      bucket.draws += 1;
+    else bucket.losses += 1;
+
+    if (rating != null) {
+      if (bucket.start == null) bucket.start = priorRating[category] ?? rating;
+      bucket.end = rating;
+    }
+  }
+
+  for (const key of ["rapid", "blitz", "bullet"] as CategoryKey[]) {
+    const b = day[key];
+    b.delta = b.start != null && b.end != null ? b.end - b.start : null;
+  }
+
+  const total = day.rapid.games + day.blitz.games + day.bullet.games;
+  return { total, day };
 }
 
 export async function loadPlayerRatings(
   dateInput?: string,
 ): Promise<{ players: PlayerRating[]; updatedAt: string; date: string }> {
-  const date = parseDate(dateInput);
+  const { key, startSec, endSec } = resolveDay(dateInput);
   let sheet = new Map<string, SheetEntry>();
   try {
     sheet = await fetchSheet();
@@ -170,14 +322,20 @@ export async function loadPlayerRatings(
         bullet: null,
         uscf: entry?.uscf ?? null,
         gamesToday: null,
+        day: null,
       };
       if (!entry?.username || entry.platform !== "chess.com") return base;
       try {
-        const [live, gamesToday] = await Promise.all([
+        const [live, breakdown] = await Promise.all([
           fetchChessComRatings(entry.username),
-          fetchGamesOnDate(entry.username, date).catch(() => null),
+          fetchDayBreakdown(entry.username, startSec, endSec).catch(() => null),
         ]);
-        return { ...base, ...live, gamesToday };
+        return {
+          ...base,
+          ...live,
+          gamesToday: breakdown?.total ?? null,
+          day: breakdown?.day ?? null,
+        };
       } catch (error) {
         console.error(`Failed to fetch chess.com ratings for ${entry.username}`, error);
         return base;
@@ -188,7 +346,6 @@ export async function loadPlayerRatings(
   return {
     players,
     updatedAt: new Date().toISOString(),
-    date: date.toISOString().slice(0, 10),
+    date: key,
   };
 }
-
