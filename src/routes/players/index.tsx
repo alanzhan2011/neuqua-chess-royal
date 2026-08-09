@@ -9,9 +9,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-import { getPlayerRatings } from "../lib/players.functions";
+import { getPlayerRatings } from "@/lib/players.functions";
 
-export const Route = createFileRoute("/players")({
+export const Route = createFileRoute("/players/")({
   head: () => ({
     meta: [
       { title: "Players & Ratings — Neuqua Valley Chess" },
