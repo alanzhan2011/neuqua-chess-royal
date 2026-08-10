@@ -2,29 +2,36 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-
-import { clubTodayDate, clubTodayKey } from "@/lib/club-time";
-import { getPlayerRatings } from "@/lib/players.functions";
+import { clubTodayDate } from "@/lib/club-time";
+import { DateRangeControls, daysAgo, rangeLabel, type Range } from "@/components/DateRangeControls";
+import { getRangeStats } from "@/lib/players.functions";
 
 export const Route = createFileRoute("/players/stats")({
   head: () => ({
     meta: [
-      { title: "Daily Rating Stats — Neuqua Valley Chess" },
+      { title: "Rating Stats — Neuqua Valley Chess" },
       {
         name: "description",
         content:
-          "Day-by-day chess.com rating gain for every Neuqua Valley Chess member, split by rapid, blitz, and bullet.",
+          "Rating gain over any stretch of days for every Neuqua Valley Chess member, split by rapid, blitz, and bullet.",
       },
-      { property: "og:title", content: "Daily Rating Stats — Neuqua Valley Chess" },
+      { property: "og:title", content: "Rating Stats — Neuqua Valley Chess" },
       {
         property: "og:description",
-        content: "Rapid, blitz, and bullet rating change per player for any day you pick.",
+        content: "Rapid, blitz, and bullet rating change per player over the date range you pick.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -35,9 +42,9 @@ export const Route = createFileRoute("/players/stats")({
 });
 
 const CATEGORIES = [
-  { key: "rapid", label: "Rapid" },
-  { key: "blitz", label: "Blitz" },
-  { key: "bullet", label: "Bullet" },
+  { key: "rapid", label: "Rapid", color: "var(--navy)" },
+  { key: "blitz", label: "Blitz", color: "var(--gold)" },
+  { key: "bullet", label: "Bullet", color: "var(--chart-4)" },
 ] as const;
 
 function Delta({ value }: { value: number | null }) {
@@ -56,36 +63,45 @@ function toDateKey(d: Date) {
 }
 
 function PlayerStatsPage() {
-  const [date, setDate] = useState<Date>(clubTodayDate);
-  const dateKey = toDateKey(date);
-  const isToday = dateKey === clubTodayKey();
+  const [range, setRange] = useState<Range>(() => ({ from: daysAgo(6), to: clubTodayDate() }));
+  const start = toDateKey(range.from);
+  const end = toDateKey(range.to);
+  const includesToday = end === toDateKey(clubTodayDate());
 
   const { data, isPending, isFetching, error } = useQuery({
-    queryKey: ["player-ratings", dateKey],
-    queryFn: () => getPlayerRatings({ data: { date: dateKey } }),
-    refetchInterval: isToday ? 5 * 60 * 1000 : false,
-    refetchOnWindowFocus: isToday,
+    queryKey: ["player-range-stats", start, end],
+    queryFn: () => getRangeStats({ data: { start, end } }),
+    refetchInterval: includesToday ? 5 * 60 * 1000 : false,
+    refetchOnWindowFocus: includesToday,
     staleTime: 60 * 1000,
   });
 
-  const players = (data?.players ?? []).filter((p) => p.day);
-  const dayLabel = isToday ? "today" : format(date, "MMM d, yyyy");
+  const players = (data?.players ?? []).filter((p) => p.totalGames > 0).sort((a, b) => b.netDelta - a.netDelta);
+  const days = data?.days ?? [];
+  const label = rangeLabel(range);
 
-  const totals = CATEGORIES.map((c) => {
-    const rows = players.filter((p) => (p.day?.[c.key].games ?? 0) > 0);
-    const net = rows.reduce((sum, p) => sum + (p.day?.[c.key].delta ?? 0), 0);
-    const games = rows.reduce((sum, p) => sum + (p.day?.[c.key].games ?? 0), 0);
-    return { ...c, net, games, playerCount: rows.length };
+  // Cumulative rating change per category, so the lines read as a trend.
+  let cr = 0;
+  let cb = 0;
+  let cu = 0;
+  const chartData = days.map((d) => {
+    cr += d.rapid;
+    cb += d.blitz;
+    cu += d.bullet;
+    return {
+      date: format(new Date(`${d.date}T12:00:00`), "MMM d"),
+      rapid: cr,
+      blitz: cb,
+      bullet: cu,
+    };
   });
 
-  const movers = [...players]
-    .map((p) => ({
-      name: p.name,
-      net: CATEGORIES.reduce((sum, c) => sum + (p.day?.[c.key].delta ?? 0), 0),
-      games: CATEGORIES.reduce((sum, c) => sum + (p.day?.[c.key].games ?? 0), 0),
-    }))
-    .filter((p) => p.games > 0)
-    .sort((a, b) => b.net - a.net);
+  const totals = CATEGORIES.map((c) => {
+    const net = players.reduce((sum, p) => sum + p.totals[c.key].delta, 0);
+    const games = players.reduce((sum, p) => sum + p.totals[c.key].games, 0);
+    const count = players.filter((p) => p.totals[c.key].games > 0).length;
+    return { ...c, net, games, playerCount: count };
+  });
 
   return (
     <div>
@@ -98,42 +114,25 @@ function PlayerStatsPage() {
             / Stats
           </p>
           <h1 className="font-display text-4xl font-bold tracking-tight text-accent-foreground md:text-5xl">
-            Rating gain by day
+            Rating gain over time
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-accent-foreground/80">
-            How much rating the team picked up or dropped on a given day, split into rapid, blitz, and bullet. Numbers
-            come from each player's chess.com game archive, so a day only shows up once games are finished.
+            Pick a single day or a stretch of days. The chart tracks the team's running rating change in rapid, blitz,
+            and bullet. Numbers come from each player's chess.com game archive.
           </p>
+          <Link
+            to="/players"
+            className="mt-8 inline-flex items-center gap-2 border-2 border-accent-foreground px-5 py-2.5 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent-foreground hover:text-accent"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to games and ratings
+          </Link>
         </div>
       </section>
 
       <section className="w-full bg-background py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mb-6 flex flex-wrap items-center gap-3">
-            <span className="text-sm font-semibold text-card-foreground">Showing</span>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-[240px] justify-start text-left font-normal")}>
-                  <CalendarIcon />
-                  {format(date, "PPP")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(d) => d && setDate(d)}
-                  disabled={{ after: clubTodayDate() }}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
-            {!isToday ? (
-              <Button variant="ghost" size="sm" onClick={() => setDate(clubTodayDate())}>
-                Back to today
-              </Button>
-            ) : null}
+            <DateRangeControls range={range} onChange={setRange} />
             {isFetching && !isPending ? (
               <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
                 <RefreshCw className="h-4 w-4 animate-spin" /> Updating
@@ -149,10 +148,55 @@ function PlayerStatsPage() {
                   {isPending ? "—" : `${t.net > 0 ? "+" : ""}${t.net}`}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {isPending ? "" : `${t.games} games from ${t.playerCount} members ${dayLabel}`}
+                  {isPending ? "" : `${t.games} games from ${t.playerCount} members, ${label}`}
                 </p>
               </div>
             ))}
+          </div>
+
+          <div className="mb-10 border border-border bg-card p-6">
+            <h2 className="font-display text-xl font-bold text-card-foreground">
+              Running rating change, {label}
+            </h2>
+            <div className="mt-6 h-[340px] w-full">
+              {isPending ? (
+                <div className="h-full w-full animate-pulse bg-muted" />
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData} margin={{ top: 8, right: 16, bottom: 0, left: -12 }}>
+                    <CartesianGrid stroke="var(--border)" vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      stroke="var(--muted-foreground)"
+                      tick={{ fontSize: 12 }}
+                      tickMargin={8}
+                      minTickGap={16}
+                    />
+                    <YAxis stroke="var(--muted-foreground)" tick={{ fontSize: 12 }} width={56} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "var(--card)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 0,
+                        color: "var(--card-foreground)",
+                      }}
+                    />
+                    <Legend />
+                    {CATEGORIES.map((c) => (
+                      <Line
+                        key={c.key}
+                        type="monotone"
+                        dataKey={c.key}
+                        name={c.label}
+                        stroke={c.color}
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
           </div>
 
           {error ? (
@@ -170,31 +214,34 @@ function PlayerStatsPage() {
                         {c.label} +/−
                       </th>
                     ))}
+                    <th className="px-4 py-3 text-right font-semibold">Net</th>
                     <th className="px-4 py-3 text-right font-semibold">Games</th>
                     <th className="px-4 py-3 text-right font-semibold">W-L-D</th>
                   </tr>
                 </thead>
                 <tbody>
                   {(isPending ? [] : players).map((p) => {
-                    const games = CATEGORIES.reduce((s, c) => s + (p.day?.[c.key].games ?? 0), 0);
-                    const w = CATEGORIES.reduce((s, c) => s + (p.day?.[c.key].wins ?? 0), 0);
-                    const l = CATEGORIES.reduce((s, c) => s + (p.day?.[c.key].losses ?? 0), 0);
-                    const d = CATEGORIES.reduce((s, c) => s + (p.day?.[c.key].draws ?? 0), 0);
+                    const w = CATEGORIES.reduce((s, c) => s + p.totals[c.key].wins, 0);
+                    const l = CATEGORIES.reduce((s, c) => s + p.totals[c.key].losses, 0);
+                    const d = CATEGORIES.reduce((s, c) => s + p.totals[c.key].draws, 0);
                     return (
                       <tr key={p.name} className="border-b border-border/60 last:border-0">
                         <td className="px-4 py-3 font-medium text-card-foreground">{p.name}</td>
                         {CATEGORIES.map((c) => (
                           <td key={c.key} className="px-4 py-3 text-right">
-                            {(p.day?.[c.key].games ?? 0) > 0 ? (
-                              <Delta value={p.day?.[c.key].delta ?? null} />
+                            {p.totals[c.key].games > 0 ? (
+                              <Delta value={p.totals[c.key].delta} />
                             ) : (
                               <span className="text-muted-foreground">—</span>
                             )}
                           </td>
                         ))}
-                        <td className="px-4 py-3 text-right tabular-nums text-card-foreground">{games}</td>
+                        <td className="px-4 py-3 text-right font-semibold">
+                          <Delta value={p.netDelta} />
+                        </td>
+                        <td className="px-4 py-3 text-right tabular-nums text-card-foreground">{p.totalGames}</td>
                         <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                          {games ? `${w}-${l}-${d}` : "—"}
+                          {`${w}-${l}-${d}`}
                         </td>
                       </tr>
                     );
@@ -202,27 +249,34 @@ function PlayerStatsPage() {
                   {isPending
                     ? Array.from({ length: 6 }).map((_, i) => (
                         <tr key={i} className="border-b border-border/60 last:border-0">
-                          <td colSpan={6} className="px-4 py-3">
+                          <td colSpan={7} className="px-4 py-3">
                             <div className="h-4 w-full animate-pulse bg-muted" />
                           </td>
                         </tr>
                       ))
                     : null}
+                  {!isPending && players.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-6 text-muted-foreground">
+                        No games logged in this range yet.
+                      </td>
+                    </tr>
+                  ) : null}
                 </tbody>
               </table>
             </div>
           )}
 
-          {!isPending && movers.length > 0 ? (
+          {!isPending && players.length > 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
-              Biggest gain {dayLabel}: {movers[0]!.name} ({movers[0]!.net > 0 ? "+" : ""}
-              {movers[0]!.net} across {movers[0]!.games} games).
+              Biggest gain, {label}: {players[0]!.name} ({players[0]!.netDelta > 0 ? "+" : ""}
+              {players[0]!.netDelta} across {players[0]!.totalGames} games).
             </p>
           ) : null}
 
           <p className="mt-4 text-xs text-muted-foreground">
-            A day runs midnight to midnight Central time. The baseline for each category is the rating after that
-            player's last game before the day started, so the change lines up with what chess.com shows.
+            A day runs midnight to midnight Central time. Rating change for a category is the sum of the swings from
+            each game in the range, so it lines up with what chess.com shows.
           </p>
         </div>
       </section>
