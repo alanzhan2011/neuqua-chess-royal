@@ -2,15 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-
-import { clubTodayDate, clubTodayKey } from "@/lib/club-time";
-import { getPlayerRatings } from "@/lib/players.functions";
+import { clubTodayDate } from "@/lib/club-time";
+import { DateRangeControls, daysAgo, rangeLabel, type Range } from "@/components/DateRangeControls";
+import { getPlayerRatings, getRangeStats } from "@/lib/players.functions";
 
 export const Route = createFileRoute("/players/")({
   head: () => ({
@@ -53,23 +49,36 @@ function toDateKey(d: Date) {
 }
 
 function PlayersPage() {
-  const [date, setDate] = useState<Date>(clubTodayDate);
-  const dateKey = toDateKey(date);
-  const isToday = dateKey === clubTodayKey();
+  const [range, setRange] = useState<Range>(() => ({ from: clubTodayDate(), to: clubTodayDate() }));
+  const start = toDateKey(range.from);
+  const end = toDateKey(range.to);
+  const includesToday = end === toDateKey(clubTodayDate());
+  const label = rangeLabel(range);
 
-  const { data, isPending, isFetching, dataUpdatedAt, error } = useQuery({
-    queryKey: ["player-ratings", dateKey],
-    queryFn: () => getPlayerRatings({ data: { date: dateKey } }),
-    refetchInterval: isToday ? 5 * 60 * 1000 : false,
-    refetchOnWindowFocus: isToday,
+  const ratings = useQuery({
+    queryKey: ["player-ratings", end],
+    queryFn: () => getPlayerRatings({ data: { date: end } }),
+    refetchInterval: includesToday ? 5 * 60 * 1000 : false,
+    refetchOnWindowFocus: includesToday,
     staleTime: 60 * 1000,
   });
 
-  const players = data?.players ?? [];
-  const totalGamesToday = players.reduce((sum, p) => sum + (p.gamesToday ?? 0), 0);
-  const activePlayers = players.filter((p) => (p.gamesToday ?? 0) > 0);
-  const dayLabel = isToday ? "today" : format(date, "MMM d, yyyy");
+  const gamesQuery = useQuery({
+    queryKey: ["player-range-stats", start, end],
+    queryFn: () => getRangeStats({ data: { start, end } }),
+    refetchInterval: includesToday ? 5 * 60 * 1000 : false,
+    refetchOnWindowFocus: includesToday,
+    staleTime: 60 * 1000,
+  });
 
+  const isPending = ratings.isPending;
+  const isFetching = ratings.isFetching || gamesQuery.isFetching;
+  const players = ratings.data?.players ?? [];
+  const gamesByName = new Map((gamesQuery.data?.players ?? []).map((p) => [p.name, p.totalGames]));
+  const gamesFor = (name: string) => (gamesQuery.data ? (gamesByName.get(name) ?? 0) : null);
+
+  const totalGames = (gamesQuery.data?.players ?? []).reduce((sum, p) => sum + p.totalGames, 0);
+  const activePlayers = (gamesQuery.data?.players ?? []).filter((p) => p.totalGames > 0);
 
   return (
     <div>
@@ -79,89 +88,59 @@ function PlayersPage() {
             Players and ratings
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-accent-foreground/80">
-            The roster, with USCF ratings and live chess.com rapid, blitz, and bullet numbers. Pick a date to see how
-            many games each person played that day.
+            The roster, with USCF ratings and live chess.com rapid, blitz, and bullet numbers. Pick a day or a range of
+            days to see how many games each person played.
           </p>
         </div>
       </section>
 
-
       <section className="w-full bg-background py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mb-6 flex flex-wrap items-center gap-3">
-            <span className="text-sm font-semibold text-card-foreground">Games played on</span>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn("w-[240px] justify-start text-left font-normal")}
-                >
-                  <CalendarIcon />
-                  {format(date, "PPP")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(d) => d && setDate(d)}
-                  disabled={{ after: clubTodayDate() }}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
-            {!isToday ? (
-              <Button variant="ghost" size="sm" onClick={() => setDate(clubTodayDate())}>
-                Back to today
-              </Button>
-            ) : null}
+            <DateRangeControls range={range} onChange={setRange} label="Games played" />
             <Link
               to="/players/stats"
               className="ml-auto border border-border px-4 py-2 text-sm font-semibold text-card-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
             >
-              Daily rating stats
+              Rating stats and graph
             </Link>
           </div>
 
           <div className="mb-10 grid gap-px border border-border bg-border sm:grid-cols-3">
             <div className="bg-card p-8">
-              <p className="text-sm font-semibold tracking-wide text-navy uppercase">
-                Games played {dayLabel}
-              </p>
+              <p className="text-sm font-semibold tracking-wide text-navy uppercase">Games played</p>
               <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
-                {isPending ? "—" : totalGamesToday}
+                {gamesQuery.isPending ? "—" : totalGames}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">Across all members on chess.com</p>
+              <p className="mt-1 text-sm text-muted-foreground">{label}, across all members on chess.com</p>
             </div>
             <div className="bg-card p-8">
               <p className="text-sm font-semibold tracking-wide text-navy uppercase">Members active</p>
               <p className="font-display mt-2 text-5xl font-bold text-navy tabular-nums">
-                {isPending ? "—" : activePlayers.length}
+                {gamesQuery.isPending ? "—" : activePlayers.length}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">Played at least one game {dayLabel}</p>
+              <p className="mt-1 text-sm text-muted-foreground">Played at least one game, {label}</p>
             </div>
             <div className="bg-card p-8">
               <p className="text-sm font-semibold tracking-wide text-navy uppercase">Most games</p>
               <p className="mt-2 text-sm leading-relaxed text-card-foreground">
-                {isPending || activePlayers.length === 0
-                  ? `Nobody logged a game ${dayLabel}.`
+                {gamesQuery.isPending || activePlayers.length === 0
+                  ? `Nobody logged a game ${label}.`
                   : [...activePlayers]
-                      .sort((a, b) => (b.gamesToday ?? 0) - (a.gamesToday ?? 0))
+                      .sort((a, b) => b.totalGames - a.totalGames)
                       .slice(0, 3)
-                      .map((p) => `${p.name} (${p.gamesToday})`)
+                      .map((p) => `${p.name} (${p.totalGames})`)
                       .join(", ")}
               </p>
             </div>
           </div>
 
-
           <div className="mb-4 flex items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
               {isPending
                 ? "Loading live ratings…"
-                : dataUpdatedAt
-                  ? `Last updated ${new Date(dataUpdatedAt).toLocaleTimeString()}`
+                : ratings.dataUpdatedAt
+                  ? `Last updated ${new Date(ratings.dataUpdatedAt).toLocaleTimeString()}`
                   : ""}
             </p>
             {isFetching && !isPending ? (
@@ -171,8 +150,7 @@ function PlayersPage() {
             ) : null}
           </div>
 
-
-          {error ? (
+          {ratings.error ? (
             <p className="border border-border bg-card p-6 text-muted-foreground">
               Ratings did not load this time. They try again automatically.
             </p>
@@ -187,9 +165,7 @@ function PlayersPage() {
                     <th className="px-4 py-3 text-right font-semibold">Rapid</th>
                     <th className="px-4 py-3 text-right font-semibold">Blitz</th>
                     <th className="px-4 py-3 text-right font-semibold">Bullet</th>
-                    <th className="px-4 py-3 text-right font-semibold">
-                      {isToday ? "Today" : format(date, "MMM d")}
-                    </th>
+                    <th className="px-4 py-3 text-right font-semibold">Games</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -229,7 +205,7 @@ function PlayersPage() {
                       <Cell value={p.rapid} />
                       <Cell value={p.blitz} />
                       <Cell value={p.bullet} />
-                      <Cell value={p.gamesToday} />
+                      <Cell value={gamesFor(p.name)} />
                     </tr>
                   ))}
                   {isPending
@@ -247,8 +223,8 @@ function PlayersPage() {
           )}
 
           <p className="mt-4 text-xs text-muted-foreground">
-            Rapid, blitz, and bullet come straight from the chess.com public API. USCF ratings come from the
-            club's rating sheet. Click a name to look it up on the US Chess site.
+            Rapid, blitz, and bullet come straight from the chess.com public API. USCF ratings come from the club's
+            rating sheet. Click a name to look it up on the US Chess site.
           </p>
         </div>
       </section>
