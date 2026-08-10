@@ -349,3 +349,218 @@ export async function loadPlayerRatings(
     date: key,
   };
 }
+
+// ---- multi-day range ------------------------------------------------------
+
+function dayKeyInZone(ts: number): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: CLUB_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(ts * 1000));
+}
+
+function monthsInRange(startSec: number, endSec: number): Array<{ y: number; m: number }> {
+  const out: Array<{ y: number; m: number }> = [];
+  const first = new Date(startSec * 1000);
+  let y = first.getUTCFullYear();
+  let m = first.getUTCMonth() + 1;
+  const last = new Date((endSec - 1) * 1000);
+  const ly = last.getUTCFullYear();
+  const lm = last.getUTCMonth() + 1;
+  while (y * 12 + m <= ly * 12 + lm && out.length < 36) {
+    out.push({ y, m });
+    m += 1;
+    if (m > 12) {
+      m = 1;
+      y += 1;
+    }
+  }
+  return out;
+}
+
+export type RangeCategoryTotals = {
+  games: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  delta: number;
+};
+
+export type RangeDay = {
+  date: string;
+  rapid: number;
+  blitz: number;
+  bullet: number;
+  games: number;
+};
+
+export type RangePlayer = {
+  name: string;
+  username: string | null;
+  totals: Record<CategoryKey, RangeCategoryTotals>;
+  totalGames: number;
+  netDelta: number;
+  perDay: Record<string, { rapid: number; blitz: number; bullet: number; games: number }>;
+};
+
+function emptyTotals(): RangeCategoryTotals {
+  return { games: 0, wins: 0, losses: 0, draws: 0, delta: 0 };
+}
+
+function dayKeyList(startKey: string, endKey: string): string[] {
+  const keys: string[] = [];
+  const [sy, sm, sd] = startKey.split("-").map(Number) as [number, number, number];
+  let cursor = Date.UTC(sy, sm - 1, sd);
+  for (let i = 0; i < 400; i++) {
+    const d = new Date(cursor);
+    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(
+      d.getUTCDate(),
+    ).padStart(2, "0")}`;
+    keys.push(key);
+    if (key >= endKey) break;
+    cursor += 86400000;
+  }
+  return keys;
+}
+
+async function fetchRangeForPlayer(
+  username: string,
+  startSec: number,
+  endSec: number,
+): Promise<Pick<RangePlayer, "totals" | "totalGames" | "netDelta" | "perDay">> {
+  const months = monthsInRange(startSec, endSec);
+  const lists = await Promise.all(months.map((mm) => fetchArchiveMonth(username, mm.y, mm.m)));
+  const games = lists
+    .flat()
+    .filter((g) => (g.rules ?? "chess") === "chess")
+    .sort((a, b) => (a.end_time ?? 0) - (b.end_time ?? 0));
+
+  const totals: Record<CategoryKey, RangeCategoryTotals> = {
+    rapid: emptyTotals(),
+    blitz: emptyTotals(),
+    bullet: emptyTotals(),
+  };
+  const perDay: RangePlayer["perDay"] = {};
+  // Rating going into the current day, per category.
+  const runningBase: Partial<Record<CategoryKey, number>> = {};
+  const lower = username.toLowerCase();
+
+  for (const g of games) {
+    const category = CATEGORY_BY_TIME_CLASS[g.time_class ?? ""];
+    if (!category) continue;
+    const isWhite = (g.white?.username ?? "").toLowerCase() === lower;
+    const me = isWhite ? g.white : g.black;
+    const rating = me?.rating ?? null;
+    const end = g.end_time ?? 0;
+
+    if (end < startSec) {
+      if (rating != null) runningBase[category] = rating;
+      continue;
+    }
+    if (end >= endSec) break;
+
+    const key = dayKeyInZone(end);
+    const bucket = (perDay[key] ??= { rapid: 0, blitz: 0, bullet: 0, games: 0 });
+    const t = totals[category];
+    t.games += 1;
+    bucket.games += 1;
+    const result = me?.result ?? "";
+    if (result === "win") t.wins += 1;
+    else if (
+      result === "agreed" ||
+      result === "repetition" ||
+      result === "stalemate" ||
+      result === "insufficient" ||
+      result === "50move" ||
+      result === "timevsinsufficient"
+    )
+      t.draws += 1;
+    else t.losses += 1;
+
+    if (rating != null) {
+      const base = runningBase[category];
+      if (base != null) {
+        const gain = rating - base;
+        t.delta += gain;
+        bucket[category] += gain;
+      }
+      runningBase[category] = rating;
+    }
+  }
+
+  const totalGames = totals.rapid.games + totals.blitz.games + totals.bullet.games;
+  const netDelta = totals.rapid.delta + totals.blitz.delta + totals.bullet.delta;
+  return { totals, totalGames, netDelta, perDay };
+}
+
+export async function loadRangeStats(
+  startInput: string,
+  endInput: string,
+): Promise<{
+  start: string;
+  end: string;
+  updatedAt: string;
+  days: RangeDay[];
+  players: RangePlayer[];
+}> {
+  const a = resolveDay(startInput);
+  const b = resolveDay(endInput);
+  const [startDay, endDay] = a.key <= b.key ? [a, b] : [b, a];
+  const startSec = startDay.startSec;
+  const endSec = endDay.endSec;
+
+  let sheet = new Map<string, SheetEntry>();
+  try {
+    sheet = await fetchSheet();
+  } catch (error) {
+    console.error("Failed to read roster sheet", error);
+  }
+
+  const players = await Promise.all(
+    ROSTER.map(async (name): Promise<RangePlayer> => {
+      const entry = sheet.get(normalizeName(name));
+      const base: RangePlayer = {
+        name,
+        username: entry?.username ?? null,
+        totals: { rapid: emptyTotals(), blitz: emptyTotals(), bullet: emptyTotals() },
+        totalGames: 0,
+        netDelta: 0,
+        perDay: {},
+      };
+      if (!entry?.username || entry.platform !== "chess.com") return base;
+      try {
+        const data = await fetchRangeForPlayer(entry.username, startSec, endSec);
+        return { ...base, ...data };
+      } catch (error) {
+        console.error(`Failed to fetch range stats for ${entry.username}`, error);
+        return base;
+      }
+    }),
+  );
+
+  const days: RangeDay[] = dayKeyList(startDay.key, endDay.key).map((date) => {
+    let rapid = 0;
+    let blitz = 0;
+    let bullet = 0;
+    let games = 0;
+    for (const p of players) {
+      const d = p.perDay[date];
+      if (!d) continue;
+      rapid += d.rapid;
+      blitz += d.blitz;
+      bullet += d.bullet;
+      games += d.games;
+    }
+    return { date, rapid, blitz, bullet, games };
+  });
+
+  return {
+    start: startDay.key,
+    end: endDay.key,
+    updatedAt: new Date().toISOString(),
+    days,
+    players,
+  };
+}
